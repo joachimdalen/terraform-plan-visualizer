@@ -7,21 +7,31 @@ import {
   Stack,
   Textarea,
 } from "@mantine/core";
-import { IconPhoto } from "@tabler/icons-react";
+import { useDisclosure } from "@mantine/hooks";
+import { IconFileUpload, IconPhoto } from "@tabler/icons-react";
 import { ReactFlowProvider } from "@xyflow/react";
 import { useState } from "react";
 import Vizualiser2 from "./Vizualiser2";
+import LoadPlanFileModal from "./modals/LoadPlanFileModal";
 import { type TfVizResource } from "./tf-parser/tf-plan-parser";
 
 function Editor() {
   const [selectedNode, setSelectedNode] = useState<TfVizResource | undefined>(
     undefined
   );
+  const [fileData, setFileData] = useState<string | undefined>(undefined);
+  const [opened, { open, close }] = useDisclosure(false);
   return (
     <Stack w="100%" gap={0}>
       <Group justify="space-between">
         <Group>
-          <Button variant="subtle" size="sm">
+          <Button
+            variant="subtle"
+            size="sm"
+            onClick={open}
+            leftSection={<IconFileUpload size={16} />}
+            color="green"
+          >
             Load plan
           </Button>
           <Button variant="subtle" size="sm">
@@ -41,7 +51,10 @@ function Editor() {
       <Divider />
       <Flex flex={1} bg="#eff3f6">
         <ReactFlowProvider>
-          <Vizualiser2 onNodeSelect={(nodeData) => setSelectedNode(nodeData)} />
+          <Vizualiser2
+            onNodeSelect={(nodeData) => setSelectedNode(nodeData)}
+            planFile={fileData}
+          />
         </ReactFlowProvider>
       </Flex>
       <Drawer
@@ -57,6 +70,7 @@ function Editor() {
           defaultValue={JSON.stringify(selectedNode, null, 2)}
         />
       </Drawer>
+      {opened && <LoadPlanFileModal onClose={close} onFileData={setFileData} />}
     </Stack>
   );
 }

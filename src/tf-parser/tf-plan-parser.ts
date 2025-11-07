@@ -1,16 +1,21 @@
+import { getModuleId, getResourceId } from "../packages/ids";
 import type { Plan, StateModule, StateResource } from "./types";
 
 export type TfVizResource = {
+  id: string;
   address: string;
   baseAddress: string;
   name: string;
   type: string;
   index?: string;
+  module?: string;
+  moduleIndex?: string;
   provider: string;
   registry: string;
 };
 
 export type TfVisModuleNoResources = {
+  id: string;
   name: string;
   address: string;
   baseAddress: string;
@@ -45,13 +50,15 @@ function parseTfResource(resource: StateResource) {
   const registry = providerName.split("/")[0];
 
   const address = getValueOrThow(resource.address);
-
+  const baseAddress = stripIndexFromAddress(address);
   const res: TfVizResource = {
+    id: getResourceId(),
     address: address,
-    baseAddress: stripIndexFromAddress(address),
+    baseAddress: baseAddress,
     name: getValueOrThow(resource.name),
     type: getValueOrThow(resource.type),
     index: resource.index as string | undefined,
+    module: getModuleName(baseAddress),
     provider,
     registry,
   };
@@ -62,6 +69,7 @@ function parseTfResource(resource: StateResource) {
 function parseTfModule(module: StateModule) {
   const address = getValueOrThow(module.address);
   const mod: TfVizModule = {
+    id: getModuleId(),
     name: address.split(".")[1],
     address: address,
     baseAddress: stripIndexFromAddress(address),
@@ -87,6 +95,10 @@ function getIndexFromAddress(address: string): string | undefined {
     return res.groups.index;
   }
   return undefined;
+}
+function getModuleName(baseAddress: string): string | undefined {
+  if (!baseAddress.startsWith("module.")) return undefined;
+  return baseAddress.split(".")[1];
 }
 
 export { parseTfPlan, parseTfResource };

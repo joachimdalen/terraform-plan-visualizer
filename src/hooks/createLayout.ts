@@ -48,7 +48,7 @@ const createLayout = async (formattedNodes, formattedEdges) => {
       height: 140,
       layoutOptions: {
         "elk.algorithm": "layered",
-        "elk.direction": "DOWN",
+        "elk.direction": "RIGHT",
         "elk.layered.spacing.nodeNodeBetweenLayers": "50",
         "elk.spacing.nodeNode": "40",
         //"elk.layered.nodePlacement.strategy": "SIMPLE",

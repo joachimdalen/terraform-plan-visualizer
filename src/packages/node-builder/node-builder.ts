@@ -1,0 +1,97 @@
+import type { Node } from "@xyflow/react";
+import type { TfVizPlan, TfVizResource } from "../../tf-parser/tf-plan-parser";
+import { getDataId } from "../ids";
+import type { TfVizConfigPlan, TfVizConfigResource } from "../tf-parser/types";
+import type { DataNodeData } from "./types";
+
+const moduleNode = "labelNode";
+const resourceNode = "resourceNode";
+const dataNode = "dataNode";
+
+function buildResourceNode(resource: TfVizResource, idx: number) {
+  const node: Node<TfVizResource> = {
+    id: resource.id,
+    position: { x: 10, y: 100 * idx },
+    data: resource,
+    type: resourceNode,
+  };
+  return node;
+}
+function buildDataNode(
+  resource: TfVizConfigResource,
+  idx: number,
+  parentId?: string
+) {
+  const node: Node<DataNodeData> = {
+    id: getDataId(),
+    position: { x: 10, y: 150 * idx },
+    data: {
+      id: resource.id,
+      address: resource.address,
+      name: resource.name,
+      type: resource.type,
+    },
+    type: dataNode,
+  };
+
+  if (parentId) {
+    return {
+      ...node,
+      parentId: parentId!,
+      extent: "parent",
+    };
+  }
+
+  return node;
+}
+
+function getNodesFromPlan2(plan: TfVizPlan, config: TfVizConfigPlan): Node[] {
+  const resourceNodes = plan.resources.map((r, i) => buildResourceNode(r, i));
+  const dataNodes = config.resources
+    .filter((x) => x.mode === "data")
+    .map((dn, i) => buildDataNode(dn, i));
+
+  const moduleNodesAndResources = plan.modules.flatMap(
+    ({ resources, baseAddress, ...modRest }, mi) => {
+      const tempName = baseAddress.split(".")[1];
+      //const modId = getModuleId();
+
+      const moduleResources = resources.map((res, ri) => {
+        const node: Node = {
+          id: res.id,
+          type: resourceNode,
+          position: { x: 10, y: (ri + 1) * 75 },
+          parentId: modRest.id,
+          extent: "parent",
+          data: res,
+        };
+        return node;
+      });
+
+      let moduleData: Node<DataNodeData>[] = [];
+      const configModule = config.modules.find((x) => x.name === tempName);
+      console.log("configModule", configModule, name);
+      if (configModule) {
+        moduleData = configModule.resources
+          .filter((x) => x.mode === "data")
+          .map((dn, i) => buildDataNode(dn, i, modRest.id));
+      }
+
+      const group: Node = {
+        id: modRest.id,
+        position: { x: 350, y: 525 * mi },
+        data: {
+          ...modRest,
+          baseAddress,
+        },
+        width: 500,
+        height: 500,
+        type: moduleNode,
+      };
+      return [group, ...moduleResources, ...moduleData];
+    }
+  );
+
+  return [...resourceNodes, ...dataNodes, ...moduleNodesAndResources];
+}
+export { getNodesFromPlan2 };

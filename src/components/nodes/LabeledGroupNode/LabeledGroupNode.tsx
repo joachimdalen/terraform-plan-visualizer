@@ -28,7 +28,7 @@ function LabeledGroupNode({
             <Group gap="xs">
               <IconPackage size={18} />
               <Text fz="sm" fw="bold" truncate>
-                {data.name}
+                {data.name}- {data.id}
               </Text>
             </Group>
             <Text fz="xs">{data.baseAddress}</Text>

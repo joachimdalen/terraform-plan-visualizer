@@ -53,7 +53,57 @@ export type Change = {
   after_identity: Record<string, object>;
 };
 export type State = {};
-export type Config = {};
+export type Config = {
+  provider_config?: Record<string, object>;
+  root_module?: ConfigModule;
+};
+export type ConfigModule = {
+  outputs?: Record<string, ConfigOutput>;
+  resources?: ConfigResource[];
+  module_calls?: Record<string, ModuleCall>;
+  variables?: Record<string, ConfigVariable>;
+};
+export type ConfigOutput = {
+  sensitive?: boolean;
+  expression?: Expression;
+  description?: string;
+  depends_on?: string[];
+};
+export type ConfigResource = {
+  address?: string;
+  mode?: "managed" | "data";
+  type?: string;
+  name?: string;
+  provider_config_key?: string;
+  provisioners?: ConfigProvisioner[];
+  expressions?: Record<string, Expression>;
+  schame_version?: number;
+  count_expression?: Expression;
+  for_each_expression?: Expression;
+  depends_on?: string[];
+};
+export type ModuleCall = {
+  source?: string;
+  expressions?: Record<string, Expression>;
+  count_expression?: Expression;
+  for_each_expression?: Expression;
+  module?: ConfigModule;
+  version_constraint?: string;
+  depends_on?: string[];
+};
+export type ConfigVariable = {
+  type?: string;
+  expression?: Record<string, Expression>;
+};
+export type Expression = {
+  constant_value?: Record<string, object>;
+  references?: string[];
+};
+export type ConfigProvisioner = {
+  type?: string;
+  expressions?: Record<string, Expression>;
+};
+
 export type ResourceAttribute = {
   resource: string;
   attribute: string;

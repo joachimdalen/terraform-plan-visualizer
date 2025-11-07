@@ -6,44 +6,83 @@ import {
   addEdge,
   applyEdgeChanges,
   applyNodeChanges,
+  type Edge,
+  type Node,
   type NodeMouseHandler,
 } from "@xyflow/react";
 import { useCallback, useEffect, useState } from "react";
+import DataNode from "./components/nodes/DataNode/DataNode";
 import LabeledGroupNode from "./components/nodes/LabeledGroupNode/LabeledGroupNode";
 import ResourceNode from "./components/nodes/ResourceNode/ResourceNode";
-import createLayout from "./hooks/createLayout";
 import useLayoutedElements from "./hooks/getLayoutedElements";
-import { getNodesFromPlan } from "./node-builder/getNodesFromPlan";
-import demoData from "./templatedata";
-import { parseTfGraph } from "./tf-parser/tf-graph-parser";
+import { buildEdges } from "./packages/node-builder/edge-builder";
+import { getNodesFromPlan2 } from "./packages/node-builder/node-builder";
+import { parseTfConfigPlan } from "./packages/tf-parser/tf-config-plan-parser";
 import { parseTfPlan } from "./tf-parser/tf-plan-parser";
+
+type Props = {
+  onNodeSelect: (node: Node) => void;
+  planFile?: string;
+};
 
 const nodeTypes = {
   resourceNode: ResourceNode,
   labelNode: LabeledGroupNode,
+  dataNode: DataNode,
 };
 
-const parsedPlan = parseTfPlan(demoData);
-const nodesFromPlan = getNodesFromPlan(parsedPlan);
-const edgesFromGraph = parseTfGraph(nodesFromPlan);
+//const parsedPlan = parseTfPlan(demoData);
+// const nodesFromPlan = getNodesFromPlan(parsedPlan);
+// const edgesFromGraph = parseTfGraph(nodesFromPlan);
 
-console.group("Parsed plan");
-console.log(parsedPlan);
-console.log(edgesFromGraph);
-console.log(nodesFromPlan);
+//console.group("Parsed plan");
+// console.log(edgesFromGraph);
+// console.log(nodesFromPlan);
 //formatNodeCluster(nodesFromPlan, edgesFromGraph).then((d) => console.log(d));
-console.groupEnd();
+//console.groupEnd();
 
-function Vizualiser2({ onNodeSelect }) {
-  const [nodes, setNodes] = useState(nodesFromPlan);
-  const [edges, setEdges] = useState(edgesFromGraph);
+// const parsedConfig = parseTfConfigPlan(demoData);
+// const nodesFromPlanAndConfig = getNodesFromPlan2(parsedPlan, parsedConfig);
+// const nodeEdges = buildEdges(parsedConfig, nodesFromPlanAndConfig);
+// console.group("Parsed configuration");
+// console.log(parsedPlan);
+// console.log(parsedConfig);
+// console.log(nodesFromPlanAndConfig);
+// console.log(nodeEdges);
+// console.groupEnd();
+
+function Vizualiser2({ onNodeSelect, planFile }: Props) {
+  const [nodes, setNodes] = useState<Node[]>([]);
+  const [edges, setEdges] = useState<Edge[]>([]);
 
   useEffect(() => {
-    createLayout(nodesFromPlan, edgesFromGraph).then((res) => {
-      setNodes(res?.nodes);
-      setEdges(res?.edges);
-    });
-  }, []);
+    if (planFile === undefined) return;
+
+    const jsonPlanFile = JSON.parse(planFile);
+    const parsedJsonPlan = parseTfPlan(jsonPlanFile);
+    const parsedJsonConfig = parseTfConfigPlan(jsonPlanFile);
+    const nodesFromPlanAndConfig = getNodesFromPlan2(
+      parsedJsonPlan,
+      parsedJsonConfig
+    );
+    const nodeEdges = buildEdges(parsedJsonConfig, nodesFromPlanAndConfig);
+    // console.group("Parsed configuration");
+    // console.log(parsedPlan);
+    // console.log(parsedConfig);
+    // console.log(nodesFromPlanAndConfig);
+    // console.log(nodeEdges);
+    // console.groupEnd();
+
+    setNodes(nodesFromPlanAndConfig);
+    setEdges(nodeEdges);
+  }, [planFile]);
+
+  // useEffect(() => {
+  //   createLayout(nodesFromPlanAndConfig, nodeEdges).then((res) => {
+  //     setNodes(res?.nodes);
+  //     setEdges(res?.edges);
+  //   });
+  // }, []);
 
   const handleNodeClick = useCallback<NodeMouseHandler>((_, node) => {
     console.log(node);

@@ -1,14 +1,10 @@
-import { Avatar, Group, Image, Paper, Stack, Text } from "@mantine/core";
+import { Avatar, Badge, Group, Image, Paper, Stack, Text } from "@mantine/core";
 import { Handle, Position, type Node, type NodeProps } from "@xyflow/react";
 import { memo } from "react";
 import providerIcons from "../../../provider-icons";
 import type { TfVizResource } from "../../../tf-parser/tf-plan-parser";
 
-function ResourceNode({
-  id,
-  isConnectable,
-  data,
-}: NodeProps<Node<TfVizResource>>) {
+function DataNode({ id, isConnectable, data }: NodeProps<Node<TfVizResource>>) {
   function getIcon() {
     const provider = providerIcons[data.provider];
     if (provider === undefined) return null;
@@ -28,7 +24,7 @@ function ResourceNode({
       h="100%"
       display="flex"
       style={{ flexDirection: "column" }}
-      bg={data.index === "basic" ? "green.1" : "yellow.1"}
+      bg="teal.2"
     >
       <Handle
         type="target"
@@ -37,9 +33,12 @@ function ResourceNode({
         isConnectable={isConnectable}
       />
       <Stack gap="0" flex={1} px="xs" pt="2">
-        <Text fz="sm" fw="bold" truncate w="190">
-          {data.index || data.name}- {data.id}
-        </Text>
+        <Group justify="space-between" wrap="nowrap">
+          <Text fz="sm" fw="bold" truncate w="170">
+            {data.index || data.name} - {data.id}
+          </Text>
+          <Badge size="xs">DATA</Badge>
+        </Group>
       </Stack>
 
       <Paper withBorder h={30} mt="auto" p={4}>
@@ -65,4 +64,4 @@ function ResourceNode({
   );
 }
 
-export default memo(ResourceNode);
+export default memo(DataNode);
