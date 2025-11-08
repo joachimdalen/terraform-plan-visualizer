@@ -1,36 +1,32 @@
-import { AppShellHeader, Box, Burger, Container, Text } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import {
+  ActionIcon,
+  AppShellHeader,
+  Container,
+  Group,
+  Text,
+} from "@mantine/core";
+import { IconBrandGithub } from "@tabler/icons-react";
 import classes from "./Header.module.css";
-const links = [
-  { link: "/snapshots", label: "Snapshots" },
-  { link: "/policies", label: "Policies" },
-  { link: "/tasks", label: "Tasks" },
-  { link: "/repo", label: "Repository" },
-  { link: "/preferences", label: "Preferences" },
-];
 
 export function Header() {
-  const [opened, { toggle }] = useDisclosure(false);
-
-  // const items = links.map((link) => (
-  //   <NavLink
-  //     key={link.label}
-  //     to={link.link}
-  //     className={classes.link}
-  //     //   data-active={active === link.link || undefined}
-  //   >
-  //     {link.label}
-  //   </NavLink>
-  // ));
-
   return (
     <AppShellHeader className={classes.header}>
       <Container size="md" className={classes.inner}>
-        <Box>
-          <Text>TfViz</Text>
-        </Box>
+        <Group>
+          <Text fw="bold">Terraform Plan Visualizer</Text>
+        </Group>
 
-        <Burger opened={opened} onClick={toggle} hiddenFrom="xs" size="sm" />
+        <Group>
+          <ActionIcon
+            component="a"
+            href="https://github.com/joachimdalen/tfviz"
+            target="_blank"
+            color="dark"
+            radius={10}
+          >
+            <IconBrandGithub />
+          </ActionIcon>
+        </Group>
       </Container>
     </AppShellHeader>
   );

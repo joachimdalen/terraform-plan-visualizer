@@ -11,6 +11,7 @@ import {
 } from "@mantine/core";
 import { IconDatabase } from "@tabler/icons-react";
 import { Handle, Position, type NodeProps } from "@xyflow/react";
+import cx from "clsx";
 import { memo } from "react";
 import providerIcons from "../../../provider-icons";
 import type { DataNode } from "../types";
@@ -31,14 +32,7 @@ function DataNode({ id, isConnectable, data, selected }: NodeProps<DataNode>) {
   return (
     <Paper
       withBorder
-      className={classes.resourceNode}
-      styles={{
-        root: selected
-          ? {
-              background: "red",
-            }
-          : undefined,
-      }}
+      className={cx(classes.resourceNode, { [classes.active]: selected })}
     >
       <Box className={classes.header}>
         <IconDatabase size={24} />
@@ -52,7 +46,7 @@ function DataNode({ id, isConnectable, data, selected }: NodeProps<DataNode>) {
       />
       <Stack gap="0" flex={1} px="xs" pt="2">
         <Text fz="sm" fw="bold" truncate w="190">
-          {data.index || data.name}- {data.id}
+          {data.name}
         </Text>
       </Stack>
       <Divider />

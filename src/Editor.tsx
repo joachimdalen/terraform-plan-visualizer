@@ -8,24 +8,24 @@ import {
   Textarea,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconFileUpload, IconHierarchy, IconPhoto } from "@tabler/icons-react";
+import { IconFileUpload, IconHierarchy } from "@tabler/icons-react";
 import { useState } from "react";
 import Vizualiser2 from "./Vizualiser2";
+import DownloadButton from "./components/DownloadButton/DownloadButton";
+import type { CustomNodeType } from "./components/nodes/types";
 import { useTfVizContext } from "./context/TfVizContext";
 import LoadPlanFileModal from "./modals/LoadPlanFileModal";
-import { type TfVizResource } from "./tf-parser/tf-plan-parser";
 
 function Editor() {
-  const [selectedNode, setSelectedNode] = useState<TfVizResource | undefined>(
+  const [selectedNode, setSelectedNode] = useState<CustomNodeType | undefined>(
     undefined
   );
-  const [fileData, setFileData] = useState<string | undefined>(undefined);
   const [opened, { open, close }] = useDisclosure(false);
   const { loadFile, reformat } = useTfVizContext();
   return (
     <Stack w="100%" gap={0}>
       <Group justify="space-between">
-        <Group>
+        <Group gap="xs">
           <Button
             variant="subtle"
             size="sm"
@@ -45,13 +45,7 @@ function Editor() {
           </Button>
         </Group>
         <Group>
-          <Button
-            variant="subtle"
-            size="sm"
-            leftSection={<IconPhoto size={16} />}
-          >
-            Download
-          </Button>
+          <DownloadButton />
         </Group>
       </Group>
       <Divider />
@@ -64,7 +58,14 @@ function Editor() {
         position="right"
         opened={selectedNode != undefined}
         onClose={() => setSelectedNode(undefined)}
-        title={selectedNode?.name}
+        title={selectedNode?.data?.name}
+        styles={{
+          header: {
+            backgroundColor: "var(--mantine-color-green-light)",
+            borderBottom: "3px solid var(--mantine-color-green-5)",
+            boxSizing: "border-box",
+          },
+        }}
       >
         <Textarea
           autosize

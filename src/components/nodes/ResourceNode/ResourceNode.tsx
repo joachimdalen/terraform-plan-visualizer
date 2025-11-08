@@ -11,11 +11,16 @@ import {
 } from "@mantine/core";
 import { IconComponents } from "@tabler/icons-react";
 import { Handle, Position, type NodeProps } from "@xyflow/react";
+import clsx from "clsx";
 import { memo } from "react";
 import providerIcons from "../../../provider-icons";
 import type { ResourceNode } from "../types";
 import classes from "./ResourceNode.module.css";
-function ResourceNode({ isConnectable, data }: NodeProps<ResourceNode>) {
+function ResourceNode({
+  isConnectable,
+  data,
+  selected,
+}: NodeProps<ResourceNode>) {
   function getIcon() {
     const provider = providerIcons[data.provider];
     if (provider === undefined) return null;
@@ -28,7 +33,10 @@ function ResourceNode({ isConnectable, data }: NodeProps<ResourceNode>) {
 
   const icon = getIcon();
   return (
-    <Paper withBorder className={classes.resourceNode}>
+    <Paper
+      withBorder
+      className={clsx(classes.resourceNode, { [classes.active]: selected })}
+    >
       <Box className={classes.header}>
         <IconComponents size={24} />
         <Text>Resource</Text>
@@ -41,7 +49,7 @@ function ResourceNode({ isConnectable, data }: NodeProps<ResourceNode>) {
       />
       <Stack gap="0" flex={1} px="xs" pt="2">
         <Text fz="sm" fw="bold" truncate w="190">
-          {data.index || data.name}- {data.id}
+          {data.index ? `${data.index} - ${data.name}` : data.name}
         </Text>
       </Stack>
       <Divider />

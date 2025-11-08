@@ -19,8 +19,8 @@ function LabeledGroupNode({ data, height, width }: NodeProps<ModuleNode>) {
       <Handle type="source" position={Position.Bottom} />
       <Box className={classes.footer}>
         <Group wrap="nowrap" align="center" gap="xs">
-          <Text fz="sm" fw="bold" truncate w="190">
-            {data.index || data.name}- {data.id}
+          <Text fz="sm" fw="bold" truncate w="250">
+            {data.index ? `${data.index} - ${data.name}` : data.name}
           </Text>
           <Text fz="xs">{data.baseAddress}</Text>
         </Group>

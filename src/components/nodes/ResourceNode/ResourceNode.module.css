@@ -5,6 +5,10 @@
   display: flex;
   flex-direction: column;
 }
+.active {
+  border-color: var(--mantine-color-blue-5);
+  border-width: 2px;
+}
 .header {
   height: 30px;
   border-bottom: 1px solid var(--mantine-color-default-border);
