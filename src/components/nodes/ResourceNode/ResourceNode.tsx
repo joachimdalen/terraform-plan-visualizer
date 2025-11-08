@@ -7,9 +7,10 @@ import {
   Paper,
   Stack,
   Text,
+  ThemeIcon,
   Tooltip,
 } from "@mantine/core";
-import { IconComponents } from "@tabler/icons-react";
+import { IconComponents, IconTrash } from "@tabler/icons-react";
 import { Handle, Position, type NodeProps } from "@xyflow/react";
 import clsx from "clsx";
 import { memo } from "react";
@@ -20,6 +21,8 @@ function ResourceNode({
   isConnectable,
   data,
   selected,
+  height,
+  width,
 }: NodeProps<ResourceNode>) {
   function getIcon() {
     const provider = providerIcons[data.provider];
@@ -47,11 +50,29 @@ function ResourceNode({
         onConnect={(params) => console.log("handle onConnect", params)}
         isConnectable={isConnectable}
       />
-      <Stack gap="0" flex={1} px="xs" pt="2">
-        <Text fz="sm" fw="bold" truncate w="190">
-          {data.index ? `${data.index} - ${data.name}` : data.name}
-        </Text>
-      </Stack>
+      <Group flex={1} px="xs" pt="2" align="center" wrap="nowrap">
+        <ThemeIcon color="red" variant="light">
+          <IconTrash />
+        </ThemeIcon>
+        <Stack gap="0">
+          <Group gap="5" wrap="nowrap">
+            <Text c="dimmed" fz="xs">
+              Name:
+            </Text>
+            <Text fz="xs" truncate w="150">
+              {data.name}
+            </Text>
+          </Group>
+          {data.index && (
+            <Group gap="3">
+              <Text c="dimmed" fz="xs">
+                Index:
+              </Text>
+              <Text fz="xs">{data.index}</Text>
+            </Group>
+          )}
+        </Stack>
+      </Group>
       <Divider />
       <Box className={classes.footer}>
         <Group wrap="nowrap" align="center" gap="xs">

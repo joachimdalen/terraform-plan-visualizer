@@ -22,6 +22,7 @@ type AppState = {
   setEdges: Dispatch<SetStateAction<Edge[]>>;
   loadFile: (fileContent: string) => void;
   reformat: () => void;
+  isLoaded: boolean;
 };
 
 const initialState: AppState = {
@@ -33,6 +34,7 @@ const initialState: AppState = {
   },
   loadFile: () => {},
   reformat: () => {},
+  isLoaded: false,
 };
 
 const TfVizContext = createContext<AppState>(initialState);
@@ -41,15 +43,9 @@ export type TfVizContextProps = PropsWithChildren<{}>;
 export function TfVizContextProvider({ children }: TfVizContextProps) {
   const [nodes, setIntNodes] = useState<CustomNodeType[]>([]);
   const [edges, setIntEdges] = useState<Edge[]>([]);
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
   const { fitView } = useReactFlow();
-
-  // const setNodes = useCallback((nds: CustomNodeType[]) => {
-  //   setIntNodes(nds);
-  // }, []);
-  // const setEdges = useCallback((edg: Edge[]) => {
-  //   setIntEdges(edg);
-  // }, []);
 
   const loadFile = useCallback((planFile: string) => {
     const jsonPlanFile = JSON.parse(planFile);
@@ -60,20 +56,15 @@ export function TfVizContextProvider({ children }: TfVizContextProps) {
       parsedJsonConfig
     );
     const nodeEdges = buildEdges(parsedJsonConfig, nodesFromPlanAndConfig);
-    // console.group("Parsed configuration");
-    // console.log(parsedPlan);
-    // console.log(parsedConfig);
-    // console.log(nodesFromPlanAndConfig);
-    // console.log(nodeEdges);
-    // console.groupEnd();
-
     setIntNodes(nodesFromPlanAndConfig);
     setIntEdges(nodeEdges);
+    setIsLoaded(true);
   }, []);
 
   const reformat = useCallback(() => {
     formatGraph(nodes, edges).then((res) => {
       setIntNodes(res);
+      fitView();
     });
     // createLayout(nodes, edges).then((res) => {
     //   setIntNodes(res?.nodes);
@@ -91,6 +82,7 @@ export function TfVizContextProvider({ children }: TfVizContextProps) {
         setEdges: setIntEdges,
         loadFile,
         reformat,
+        isLoaded,
       }}
     >
       {children}

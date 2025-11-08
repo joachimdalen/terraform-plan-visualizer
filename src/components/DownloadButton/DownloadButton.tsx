@@ -6,6 +6,7 @@ import {
   useReactFlow,
 } from "@xyflow/react";
 import { toPng } from "html-to-image";
+import { useTfVizContext } from "../../context/TfVizContext";
 
 function downloadImage(dataUrl) {
   const a = document.createElement("a");
@@ -20,6 +21,7 @@ const imageHeight = 768;
 
 function DownloadButton() {
   const { getNodes } = useReactFlow();
+  const { isLoaded } = useTfVizContext();
   const onClick = () => {
     // we calculate a transform for the nodes so that all nodes are visible
     // we then overwrite the transform of the `.react-flow__viewport` element
@@ -52,6 +54,7 @@ function DownloadButton() {
       size="sm"
       leftSection={<IconPhoto size={16} />}
       onClick={onClick}
+      disabled={!isLoaded}
     >
       Download
     </Button>

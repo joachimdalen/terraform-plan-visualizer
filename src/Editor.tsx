@@ -1,4 +1,5 @@
 import {
+  ActionIcon,
   Button,
   Divider,
   Drawer,
@@ -6,9 +7,11 @@ import {
   Group,
   Stack,
   Textarea,
+  Tooltip,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconFileUpload, IconHierarchy } from "@tabler/icons-react";
+import { IconEye, IconFileUpload, IconHierarchy } from "@tabler/icons-react";
+import { useReactFlow } from "@xyflow/react";
 import { useState } from "react";
 import Vizualiser2 from "./Vizualiser2";
 import DownloadButton from "./components/DownloadButton/DownloadButton";
@@ -21,7 +24,8 @@ function Editor() {
     undefined
   );
   const [opened, { open, close }] = useDisclosure(false);
-  const { loadFile, reformat } = useTfVizContext();
+  const { loadFile, reformat, isLoaded } = useTfVizContext();
+  const { fitView } = useReactFlow();
   return (
     <Stack w="100%" gap={0}>
       <Group justify="space-between">
@@ -40,11 +44,21 @@ function Editor() {
             size="sm"
             leftSection={<IconHierarchy size={16} />}
             onClick={reformat}
+            disabled={!isLoaded}
           >
             Reformat
           </Button>
         </Group>
         <Group>
+          <Tooltip label="Fit view">
+            <ActionIcon
+              variant="subtle"
+              color="blue.5"
+              onClick={() => fitView()}
+            >
+              <IconEye />
+            </ActionIcon>
+          </Tooltip>
           <DownloadButton />
         </Group>
       </Group>

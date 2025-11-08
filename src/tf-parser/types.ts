@@ -40,7 +40,8 @@ export type DeferredResourceChange = {
   resource_change?: ResourceChange;
 };
 export type Change = {
-  actions?: Actions;
+  //actions?: Actions;
+  actions?: string[];
   before: Record<string, object>;
   after?: Record<string, object>;
   after_unknown?: Record<string, object>;
