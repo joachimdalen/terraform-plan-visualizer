@@ -1,14 +1,21 @@
-import { Avatar, Group, Image, Paper, Stack, Text } from "@mantine/core";
-import { Handle, Position, type Node, type NodeProps } from "@xyflow/react";
+import {
+  Avatar,
+  Box,
+  Divider,
+  Group,
+  Image,
+  Paper,
+  Stack,
+  Text,
+  Tooltip,
+} from "@mantine/core";
+import { IconComponents } from "@tabler/icons-react";
+import { Handle, Position, type NodeProps } from "@xyflow/react";
 import { memo } from "react";
 import providerIcons from "../../../provider-icons";
-import type { TfVizResource } from "../../../tf-parser/tf-plan-parser";
-
-function ResourceNode({
-  id,
-  isConnectable,
-  data,
-}: NodeProps<Node<TfVizResource>>) {
+import type { ResourceNode } from "../types";
+import classes from "./ResourceNode.module.css";
+function ResourceNode({ isConnectable, data }: NodeProps<ResourceNode>) {
   function getIcon() {
     const provider = providerIcons[data.provider];
     if (provider === undefined) return null;
@@ -21,15 +28,11 @@ function ResourceNode({
 
   const icon = getIcon();
   return (
-    <Paper
-      withBorder
-      w={250}
-      mih={65}
-      h="100%"
-      display="flex"
-      style={{ flexDirection: "column" }}
-      bg={data.index === "basic" ? "green.1" : "yellow.1"}
-    >
+    <Paper withBorder className={classes.resourceNode}>
+      <Box className={classes.header}>
+        <IconComponents size={24} />
+        <Text>Resource</Text>
+      </Box>
       <Handle
         type="target"
         position={Position.Left}
@@ -41,8 +44,8 @@ function ResourceNode({
           {data.index || data.name}- {data.id}
         </Text>
       </Stack>
-
-      <Paper withBorder h={30} mt="auto" p={4}>
+      <Divider />
+      <Box className={classes.footer}>
         <Group wrap="nowrap" align="center" gap="xs">
           {icon ? (
             <Image src={icon} h={15} w={15} />
@@ -51,11 +54,14 @@ function ResourceNode({
               AZ
             </Avatar>
           )}
-          <Text fz="xs" truncate w="190">
-            {data.type}
-          </Text>
+          <Tooltip label={data.type}>
+            <Text fz="xs" truncate w="190">
+              {data.type}
+            </Text>
+          </Tooltip>
         </Group>
-      </Paper>
+      </Box>
+      {/* <Paper h={30} mt="auto" p={4}></Paper> */}
       <Handle
         type="source"
         position={Position.Right}

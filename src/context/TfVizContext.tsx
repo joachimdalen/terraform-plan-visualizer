@@ -1,50 +1,106 @@
-import type { Edge, Node } from "@xyflow/react";
+import { useReactFlow, type Edge } from "@xyflow/react";
 import {
   createContext,
-  PropsWithChildren,
   useCallback,
   useContext,
   useState,
+  type Dispatch,
+  type PropsWithChildren,
+  type SetStateAction,
 } from "react";
+import type { CustomNodeType } from "../components/nodes/types";
+import { buildEdges } from "../packages/node-builder/edge-builder";
+import { formatGraph } from "../packages/node-builder/graph-formatter";
+import { getNodesFromPlan2 } from "../packages/node-builder/node-builder";
+import { parseTfConfigPlan } from "../packages/tf-parser/tf-config-plan-parser";
+import { parseTfPlan } from "../tf-parser/tf-plan-parser";
 
 type AppState = {
-  nodes: Node[];
+  nodes: CustomNodeType[];
   edges: Edge[];
+  setNodes: Dispatch<SetStateAction<CustomNodeType[]>>;
+  setEdges: Dispatch<SetStateAction<Edge[]>>;
+  loadFile: (fileContent: string) => void;
+  reformat: () => void;
 };
 
 const initialState: AppState = {
   nodes: [],
   edges: [],
+  setNodes: () => {},
+  setEdges: () => {
+    return [];
+  },
+  loadFile: () => {},
+  reformat: () => {},
 };
 
-const AppContext = createContext<AppState>(initialState);
+const TfVizContext = createContext<AppState>(initialState);
 
-export type AppContextProps = PropsWithChildren<{}>;
-export function AppContextProvider({ children }: AppContextProps) {
-  const [nodes, setIntNodes] = useState<Node[]>([]);
-  const [edges, setIntEdges] = useState<Node[]>([]);
+export type TfVizContextProps = PropsWithChildren<{}>;
+export function TfVizContextProvider({ children }: TfVizContextProps) {
+  const [nodes, setIntNodes] = useState<CustomNodeType[]>([]);
+  const [edges, setIntEdges] = useState<Edge[]>([]);
 
-  const setNodes = useCallback((nds: Node[]) => {
-    setIntNodes(nds);
+  const { fitView } = useReactFlow();
+
+  // const setNodes = useCallback((nds: CustomNodeType[]) => {
+  //   setIntNodes(nds);
+  // }, []);
+  // const setEdges = useCallback((edg: Edge[]) => {
+  //   setIntEdges(edg);
+  // }, []);
+
+  const loadFile = useCallback((planFile: string) => {
+    const jsonPlanFile = JSON.parse(planFile);
+    const parsedJsonPlan = parseTfPlan(jsonPlanFile);
+    const parsedJsonConfig = parseTfConfigPlan(jsonPlanFile);
+    const nodesFromPlanAndConfig = getNodesFromPlan2(
+      parsedJsonPlan,
+      parsedJsonConfig
+    );
+    const nodeEdges = buildEdges(parsedJsonConfig, nodesFromPlanAndConfig);
+    // console.group("Parsed configuration");
+    // console.log(parsedPlan);
+    // console.log(parsedConfig);
+    // console.log(nodesFromPlanAndConfig);
+    // console.log(nodeEdges);
+    // console.groupEnd();
+
+    setIntNodes(nodesFromPlanAndConfig);
+    setIntEdges(nodeEdges);
   }, []);
-  const setEdges = useCallback((edg: Edge[]) => {
-    setIntEdges(nodes);
-  }, []);
+
+  const reformat = useCallback(() => {
+    formatGraph(nodes, edges).then((res) => {
+      setIntNodes(res);
+    });
+    // createLayout(nodes, edges).then((res) => {
+    //   setIntNodes(res?.nodes);
+    //   setIntEdges(res?.edges);
+    //   fitView();
+    // });
+  }, [nodes, edges]);
 
   return (
-    <AppContext.Provider
+    <TfVizContext.Provider
       value={{
-        dockApi,
-        setDockApi,
+        nodes,
+        edges,
+        setNodes: setIntNodes,
+        setEdges: setIntEdges,
+        loadFile,
+        reformat,
       }}
     >
       {children}
-    </AppContext.Provider>
+    </TfVizContext.Provider>
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useTfVizContext() {
-  const context = useContext(AppContext);
+  const context = useContext(TfVizContext);
   if (context === undefined) {
     throw new Error("useAppContext must be used within a AppContextProvider");
   }

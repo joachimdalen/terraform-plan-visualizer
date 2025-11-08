@@ -1,19 +1,23 @@
-import type { Node, NodeProps } from "@xyflow/react";
-import type { Edge } from "ts-graphviz";
-import type { TfVizResource } from "../../tf-parser/tf-plan-parser";
+import { type Edge } from "@xyflow/react";
+import type {
+  CustomNodeType,
+  ModuleNode,
+  ResourceNode,
+} from "../../components/nodes/types";
 import { getEdgeId } from "../ids";
 import type { TfVizConfigPlan, TfVizConfigResource } from "../tf-parser/types";
 
-const edgeType = "step";
+const edgeType = "smoothstep";
 
-function buildEdges(
-  config: TfVizConfigPlan,
-  nodes: NodeProps<Node<TfVizResource>>[]
-) {
+function buildEdges(config: TfVizConfigPlan, nodes: CustomNodeType[]) {
   let edges: Edge[] = [];
   for (const node of nodes) {
     if (node.id.startsWith("res-") && node.parentId === undefined) {
-      const builtEdges = buildRootResourceEdge(node, config, nodes);
+      const builtEdges = buildRootResourceEdge(
+        node as ResourceNode,
+        config,
+        nodes
+      );
       if (builtEdges === undefined) continue;
 
       edges = edges.concat(builtEdges);
@@ -21,7 +25,7 @@ function buildEdges(
     }
 
     if (node.id.startsWith("mod-")) {
-      const builtEdges = buildModuleEdge(node, config, nodes);
+      const builtEdges = buildModuleEdge(node as ModuleNode, config, nodes);
       if (builtEdges === undefined) continue;
 
       edges = edges.concat(builtEdges);
@@ -29,7 +33,11 @@ function buildEdges(
     }
 
     if (node.id.startsWith("res-") && node.parentId !== undefined) {
-      const builtEdges = buildModuleResourceEdge(node, config, nodes);
+      const builtEdges = buildModuleResourceEdge(
+        node as ResourceNode,
+        config,
+        nodes
+      );
       if (builtEdges === undefined) continue;
 
       edges = edges.concat(builtEdges);
@@ -48,9 +56,9 @@ function buildEdges(
 }
 
 function buildRootResourceEdge(
-  node: NodeProps<Node<TfVizResource>>,
+  node: ResourceNode,
   config: TfVizConfigPlan,
-  nodes: NodeProps<Node<TfVizResource>>[]
+  nodes: CustomNodeType[]
 ): Edge[] | undefined {
   const edges: Edge[] = [];
   // The node is not in a module or indexed
@@ -96,9 +104,9 @@ function buildRootResourceEdge(
   return edges;
 }
 function buildModuleResourceEdge(
-  node: NodeProps<Node<TfVizResource>>,
+  node: ResourceNode,
   config: TfVizConfigPlan,
-  nodes: NodeProps<Node<TfVizResource>>[]
+  nodes: CustomNodeType[]
 ): Edge[] | undefined {
   const edges: Edge[] = [];
   const parent = nodes.find((x) => x.id === node.parentId);
@@ -141,9 +149,9 @@ function buildModuleResourceEdge(
 }
 
 function buildModuleEdge(
-  node: NodeProps<Node<TfVizResource>>,
+  node: ModuleNode,
   config: TfVizConfigPlan,
-  nodes: NodeProps<Node<TfVizResource>>[]
+  nodes: CustomNodeType[]
 ): Edge[] | undefined {
   const edges: Edge[] = [];
   if (node.data.index === undefined) {

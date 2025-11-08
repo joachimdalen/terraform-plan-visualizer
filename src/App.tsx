@@ -1,6 +1,8 @@
 import { AppShell, MantineProvider } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
+import { ReactFlowProvider } from "@xyflow/react";
 import { Header } from "./components/Header/Header";
+import { TfVizContextProvider } from "./context/TfVizContext";
 import Editor from "./Editor";
 
 function App() {
@@ -19,7 +21,11 @@ function App() {
       >
         <Header />
         <AppShell.Main px="0">
-          <Editor />
+          <ReactFlowProvider>
+            <TfVizContextProvider>
+              <Editor />
+            </TfVizContextProvider>
+          </ReactFlowProvider>
         </AppShell.Main>
       </AppShell>
     </MantineProvider>

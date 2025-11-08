@@ -1,0 +1,31 @@
+.resourceNode {
+  width: 250px;
+  min-height: 100px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.header {
+  height: 30px;
+  border-bottom: 1px solid var(--mantine-color-default-border);
+  display: flex;
+  padding: 2px 4px;
+  align-items: center;
+  background-color: var(--mantine-color-blue-light);
+  p {
+    font-size: var(--mantine-font-size-xs);
+    margin-left: 5px;
+    font-weight: bold;
+    color: var(--mantine-color-blue-5);
+  }
+  svg {
+    color: var(--mantine-color-blue-5);
+  }
+}
+.footer {
+  height: 25px;
+  padding: 2px 4px;
+  align-items: center;
+  display: flex;
+  background-color: var(--mantine-color-gray-1);
+}

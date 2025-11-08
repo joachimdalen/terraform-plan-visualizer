@@ -1,41 +1,30 @@
-import { Group, Paper, Stack, Text } from "@mantine/core";
+import { Box, Group, Paper, Text } from "@mantine/core";
 import { IconPackage } from "@tabler/icons-react";
-import { Handle, Position, type Node, type NodeProps } from "@xyflow/react";
+import { Handle, Position, type NodeProps } from "@xyflow/react";
 import { memo } from "react";
-import type { TfVisModuleNoResources } from "../../../tf-parser/tf-plan-parser";
-
-function LabeledGroupNode({
-  data,
-  height,
-  width,
-}: NodeProps<Node<TfVisModuleNoResources>>) {
+import type { ModuleNode } from "../types";
+import classes from "./LabeledGroupNode.module.css";
+function LabeledGroupNode({ data, height, width }: NodeProps<ModuleNode>) {
   return (
-    <Paper
-      withBorder
-      bg="transparent"
-      style={{ borderColor: "var(--mantine-color-blue-5)" }}
-      h={height}
-      w={width}
-    >
+    <Paper withBorder className={classes.node} h={height} w={width}>
       <Handle
         type="target"
         position={Position.Top}
         onConnect={(params) => console.log("handle onConnect", params)}
       />
-      <Paper withBorder p="xs" bg="yellow.1">
-        <Group wrap="nowrap">
-          <Stack gap="0">
-            <Group gap="xs">
-              <IconPackage size={18} />
-              <Text fz="sm" fw="bold" truncate>
-                {data.name}- {data.id}
-              </Text>
-            </Group>
-            <Text fz="xs">{data.baseAddress}</Text>
-          </Stack>
-        </Group>
-      </Paper>
+      <Box className={classes.header}>
+        <IconPackage size={24} />
+        <Text>Module</Text>
+      </Box>
       <Handle type="source" position={Position.Bottom} />
+      <Box className={classes.footer}>
+        <Group wrap="nowrap" align="center" gap="xs">
+          <Text fz="sm" fw="bold" truncate w="190">
+            {data.index || data.name}- {data.id}
+          </Text>
+          <Text fz="xs">{data.baseAddress}</Text>
+        </Group>
+      </Box>
     </Paper>
   );
 }

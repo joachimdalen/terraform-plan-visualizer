@@ -1,10 +1,22 @@
-import { Avatar, Badge, Group, Image, Paper, Stack, Text } from "@mantine/core";
-import { Handle, Position, type Node, type NodeProps } from "@xyflow/react";
+import {
+  Avatar,
+  Box,
+  Divider,
+  Group,
+  Image,
+  Paper,
+  Stack,
+  Text,
+  Tooltip,
+} from "@mantine/core";
+import { IconDatabase } from "@tabler/icons-react";
+import { Handle, Position, type NodeProps } from "@xyflow/react";
 import { memo } from "react";
 import providerIcons from "../../../provider-icons";
-import type { TfVizResource } from "../../../tf-parser/tf-plan-parser";
+import type { DataNode } from "../types";
+import classes from "./DataNode.module.css";
 
-function DataNode({ id, isConnectable, data }: NodeProps<Node<TfVizResource>>) {
+function DataNode({ id, isConnectable, data, selected }: NodeProps<DataNode>) {
   function getIcon() {
     const provider = providerIcons[data.provider];
     if (provider === undefined) return null;
@@ -19,13 +31,19 @@ function DataNode({ id, isConnectable, data }: NodeProps<Node<TfVizResource>>) {
   return (
     <Paper
       withBorder
-      w={250}
-      mih={65}
-      h="100%"
-      display="flex"
-      style={{ flexDirection: "column" }}
-      bg="teal.2"
+      className={classes.resourceNode}
+      styles={{
+        root: selected
+          ? {
+              background: "red",
+            }
+          : undefined,
+      }}
     >
+      <Box className={classes.header}>
+        <IconDatabase size={24} />
+        <Text>Data</Text>
+      </Box>
       <Handle
         type="target"
         position={Position.Left}
@@ -33,15 +51,12 @@ function DataNode({ id, isConnectable, data }: NodeProps<Node<TfVizResource>>) {
         isConnectable={isConnectable}
       />
       <Stack gap="0" flex={1} px="xs" pt="2">
-        <Group justify="space-between" wrap="nowrap">
-          <Text fz="sm" fw="bold" truncate w="170">
-            {data.index || data.name} - {data.id}
-          </Text>
-          <Badge size="xs">DATA</Badge>
-        </Group>
+        <Text fz="sm" fw="bold" truncate w="190">
+          {data.index || data.name}- {data.id}
+        </Text>
       </Stack>
-
-      <Paper withBorder h={30} mt="auto" p={4}>
+      <Divider />
+      <Box className={classes.footer}>
         <Group wrap="nowrap" align="center" gap="xs">
           {icon ? (
             <Image src={icon} h={15} w={15} />
@@ -50,11 +65,14 @@ function DataNode({ id, isConnectable, data }: NodeProps<Node<TfVizResource>>) {
               AZ
             </Avatar>
           )}
-          <Text fz="xs" truncate w="190">
-            {data.type}
-          </Text>
+          <Tooltip label={data.type}>
+            <Text fz="xs" truncate w="190">
+              {data.type}
+            </Text>
+          </Tooltip>
         </Group>
-      </Paper>
+      </Box>
+      {/* <Paper h={30} mt="auto" p={4}></Paper> */}
       <Handle
         type="source"
         position={Position.Right}

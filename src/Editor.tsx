@@ -8,10 +8,10 @@ import {
   Textarea,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconFileUpload, IconPhoto } from "@tabler/icons-react";
-import { ReactFlowProvider } from "@xyflow/react";
+import { IconFileUpload, IconHierarchy, IconPhoto } from "@tabler/icons-react";
 import { useState } from "react";
 import Vizualiser2 from "./Vizualiser2";
+import { useTfVizContext } from "./context/TfVizContext";
 import LoadPlanFileModal from "./modals/LoadPlanFileModal";
 import { type TfVizResource } from "./tf-parser/tf-plan-parser";
 
@@ -21,6 +21,7 @@ function Editor() {
   );
   const [fileData, setFileData] = useState<string | undefined>(undefined);
   const [opened, { open, close }] = useDisclosure(false);
+  const { loadFile, reformat } = useTfVizContext();
   return (
     <Stack w="100%" gap={0}>
       <Group justify="space-between">
@@ -34,8 +35,13 @@ function Editor() {
           >
             Load plan
           </Button>
-          <Button variant="subtle" size="sm">
-            Load plan
+          <Button
+            variant="subtle"
+            size="sm"
+            leftSection={<IconHierarchy size={16} />}
+            onClick={reformat}
+          >
+            Reformat
           </Button>
         </Group>
         <Group>
@@ -50,12 +56,7 @@ function Editor() {
       </Group>
       <Divider />
       <Flex flex={1} bg="#eff3f6">
-        <ReactFlowProvider>
-          <Vizualiser2
-            onNodeSelect={(nodeData) => setSelectedNode(nodeData)}
-            planFile={fileData}
-          />
-        </ReactFlowProvider>
+        <Vizualiser2 onNodeSelect={(nodeData) => setSelectedNode(nodeData)} />
       </Flex>
       <Drawer
         offset={8}
@@ -70,7 +71,9 @@ function Editor() {
           defaultValue={JSON.stringify(selectedNode, null, 2)}
         />
       </Drawer>
-      {opened && <LoadPlanFileModal onClose={close} onFileData={setFileData} />}
+      {opened && (
+        <LoadPlanFileModal onClose={close} onFileData={(fc) => loadFile(fc)} />
+      )}
     </Stack>
   );
 }

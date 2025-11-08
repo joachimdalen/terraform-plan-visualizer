@@ -88,7 +88,9 @@ const createLayout = async (formattedNodes, formattedEdges) => {
         id: current.id,
         position: { x: current.x, y: current.y },
         data: current.data,
-        style: { width: current.width, height: current.height },
+        style: current.id.startsWith("mod-")
+          ? { width: current.width + 100, height: current.height + 100 }
+          : { width: current.width, height: current.height },
         type: current.type,
       } as never);
 

@@ -1,8 +1,13 @@
 import type { Node } from "@xyflow/react";
+import type {
+  CustomNodeType,
+  DataNode,
+  ModuleNode,
+  ResourceNode,
+} from "../../components/nodes/types";
 import type { TfVizPlan, TfVizResource } from "../../tf-parser/tf-plan-parser";
 import { getDataId } from "../ids";
 import type { TfVizConfigPlan, TfVizConfigResource } from "../tf-parser/types";
-import type { DataNodeData } from "./types";
 
 const moduleNode = "labelNode";
 const resourceNode = "resourceNode";
@@ -21,8 +26,8 @@ function buildDataNode(
   resource: TfVizConfigResource,
   idx: number,
   parentId?: string
-) {
-  const node: Node<DataNodeData> = {
+): DataNode {
+  const node: DataNode = {
     id: getDataId(),
     position: { x: 10, y: 150 * idx },
     data: {
@@ -45,7 +50,10 @@ function buildDataNode(
   return node;
 }
 
-function getNodesFromPlan2(plan: TfVizPlan, config: TfVizConfigPlan): Node[] {
+function getNodesFromPlan2(
+  plan: TfVizPlan,
+  config: TfVizConfigPlan
+): CustomNodeType[] {
   const resourceNodes = plan.resources.map((r, i) => buildResourceNode(r, i));
   const dataNodes = config.resources
     .filter((x) => x.mode === "data")
@@ -57,7 +65,7 @@ function getNodesFromPlan2(plan: TfVizPlan, config: TfVizConfigPlan): Node[] {
       //const modId = getModuleId();
 
       const moduleResources = resources.map((res, ri) => {
-        const node: Node = {
+        const node: ResourceNode = {
           id: res.id,
           type: resourceNode,
           position: { x: 10, y: (ri + 1) * 75 },
@@ -68,7 +76,7 @@ function getNodesFromPlan2(plan: TfVizPlan, config: TfVizConfigPlan): Node[] {
         return node;
       });
 
-      let moduleData: Node<DataNodeData>[] = [];
+      let moduleData: DataNode[] = [];
       const configModule = config.modules.find((x) => x.name === tempName);
       console.log("configModule", configModule, name);
       if (configModule) {
@@ -77,7 +85,7 @@ function getNodesFromPlan2(plan: TfVizPlan, config: TfVizConfigPlan): Node[] {
           .map((dn, i) => buildDataNode(dn, i, modRest.id));
       }
 
-      const group: Node = {
+      const group: ModuleNode = {
         id: modRest.id,
         position: { x: 350, y: 525 * mi },
         data: {
