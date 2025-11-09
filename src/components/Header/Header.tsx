@@ -1,10 +1,4 @@
-import {
-  ActionIcon,
-  AppShellHeader,
-  Container,
-  Group,
-  Text,
-} from "@mantine/core";
+import { Anchor, AppShellHeader, Container, Group, Text } from "@mantine/core";
 import { IconBrandGithub } from "@tabler/icons-react";
 import classes from "./Header.module.css";
 
@@ -17,15 +11,16 @@ export function Header() {
         </Group>
 
         <Group>
-          <ActionIcon
-            component="a"
+          <Anchor
             href="https://github.com/joachimdalen/tfviz"
             target="_blank"
-            color="dark"
-            radius={10}
+            c="dark"
           >
-            <IconBrandGithub />
-          </ActionIcon>
+            <Group gap="4">
+              <IconBrandGithub size={16} />
+              <Text fz="sm">View source</Text>
+            </Group>
+          </Anchor>
         </Group>
       </Container>
     </AppShellHeader>

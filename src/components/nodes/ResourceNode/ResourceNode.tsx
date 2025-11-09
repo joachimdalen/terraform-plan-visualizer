@@ -1,35 +1,13 @@
-import {
-  Avatar,
-  Badge,
-  Box,
-  Divider,
-  Group,
-  Image,
-  Paper,
-  Stack,
-  Text,
-  Tooltip,
-} from "@mantine/core";
+import { Box, Divider, Group, Paper, Stack, Text } from "@mantine/core";
 import { IconComponents } from "@tabler/icons-react";
 import { Handle, Position, type NodeProps } from "@xyflow/react";
 import clsx from "clsx";
 import { memo } from "react";
-import providerIcons from "../../../provider-icons";
 import ChangeTypeIcon from "../../ChangeTypeIcon";
+import ProviderLabel from "../../ProviderLabel/ProviderLabel";
 import type { ResourceNode } from "../types";
 import classes from "./ResourceNode.module.css";
 function ResourceNode({ data, selected }: NodeProps<ResourceNode>) {
-  function getIcon() {
-    const provider = providerIcons[data.provider];
-    if (provider === undefined) return null;
-    const icon = provider[data.type];
-    if (icon) return icon;
-    const defaultIcon = provider["default"];
-    if (defaultIcon) return defaultIcon;
-    return null;
-  }
-
-  const icon = getIcon();
   return (
     <Paper
       withBorder
@@ -40,11 +18,11 @@ function ResourceNode({ data, selected }: NodeProps<ResourceNode>) {
           <IconComponents size={24} />
           <Text>Resource</Text>
         </Group>
-        <Tooltip label="The resource has drifted">
+        {/* <Tooltip label="The resource has drifted">
           <Badge size="xs" color="grape.9" ml="auto" tt="none">
             DRIFTED
           </Badge>
-        </Tooltip>
+        </Tooltip> */}
       </Box>
       <Handle type="target" position={Position.Left} />
       <Group flex={1} px="xs" pt="2" align="center" wrap="nowrap">
@@ -58,7 +36,7 @@ function ResourceNode({ data, selected }: NodeProps<ResourceNode>) {
               {data.name}
             </Text>
           </Group>
-          {data.index && (
+          {data.index !== undefined && (
             <Group gap="3">
               <Text c="dimmed" fz="xs">
                 Index:
@@ -70,20 +48,7 @@ function ResourceNode({ data, selected }: NodeProps<ResourceNode>) {
       </Group>
       <Divider />
       <Box className={classes.footer}>
-        <Group wrap="nowrap" align="center" gap="xs">
-          {icon ? (
-            <Image src={icon} h={15} w={15} />
-          ) : (
-            <Avatar size="15" color="teal" radius={0}>
-              AZ
-            </Avatar>
-          )}
-          <Tooltip label={data.type}>
-            <Text fz="xs" truncate w="190">
-              {data.type}
-            </Text>
-          </Tooltip>
-        </Group>
+        <ProviderLabel provider={data.provider} type={data.type} />
       </Box>
       <Handle type="source" position={Position.Right} />
     </Paper>

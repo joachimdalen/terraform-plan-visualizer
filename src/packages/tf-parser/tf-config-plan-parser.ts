@@ -63,7 +63,7 @@ function parseTfResource(
     mode: mode as "managed" | "data",
     name: getValueOrThow(resource.name),
     type: getValueOrThow(resource.type),
-    provider: provider!.value!,
+    provider: provider?.value || "unknown",
     isLooped: resource.for_each_expression !== undefined,
     dependsOn: getDependencies(resource.expressions),
   };
