@@ -1,3 +1,4 @@
+import { useComputedColorScheme } from "@mantine/core";
 import {
   Background,
   BackgroundVariant,
@@ -33,7 +34,9 @@ const nodeTypes = {
 
 function Vizualiser2({ onNodeSelect }: Props) {
   const { nodes, edges, setNodes, setEdges } = useTfVizContext();
-
+  const computedColorScheme = useComputedColorScheme("light", {
+    getInitialValueInEffect: true,
+  });
   const highlightNodeDependencies = useCallback(
     (nodeId: string, isSelected: boolean) => {
       console.log("isSelected", isSelected);
@@ -127,9 +130,10 @@ function Vizualiser2({ onNodeSelect }: Props) {
       onNodeDoubleClick={onNodeDoubleClick}
       onNodeClick={handleNodeClick}
       fitView
+      colorMode={computedColorScheme === "light" ? "light" : "dark"}
     >
-      <Background color="black" variant={BackgroundVariant.Dots} />
-      <Controls />
+      <Background variant={BackgroundVariant.Dots} />
+      <Controls orientation="horizontal" />
     </ReactFlow>
   );
 }

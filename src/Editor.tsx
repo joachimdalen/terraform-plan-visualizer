@@ -6,7 +6,6 @@ import {
   Flex,
   Group,
   Stack,
-  Textarea,
   TextInput,
   Tooltip,
 } from "@mantine/core";
@@ -27,6 +26,7 @@ function Editor() {
   const [opened, { open, close }] = useDisclosure(false);
   const { loadFile, reformat, isLoaded } = useTfVizContext();
   const { fitView } = useReactFlow();
+
   return (
     <Stack w="100%" gap={0}>
       <Group justify="space-between">
@@ -131,10 +131,10 @@ function Editor() {
               variant="filled"
             />
 
-            <Textarea
+            {/* <Textarea
               autosize
               defaultValue={JSON.stringify(selectedNode, null, 2)}
-            />
+            /> */}
           </Stack>
         </Drawer>
       )}

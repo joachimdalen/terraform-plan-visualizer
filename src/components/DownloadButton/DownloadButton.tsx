@@ -5,6 +5,7 @@ import {
   MenuItem,
   MenuTarget,
 } from "@mantine/core";
+import { randomId } from "@mantine/hooks";
 import {
   IconFileTypePng,
   IconFileTypeSvg,
@@ -17,27 +18,29 @@ import {
 } from "@xyflow/react";
 import { toPng, toSvg } from "html-to-image";
 import type { Options } from "html-to-image/lib/types";
+import { useState } from "react";
 import { useTfVizContext } from "../../context/TfVizContext";
 import helperClasses from "../helpers.module.css";
 function downloadImage(dataUrl: string, type: "png" | "svg") {
   const a = document.createElement("a");
-
-  a.setAttribute("download", `reactflow.${type}`);
+  a.setAttribute("download", `${randomId("plan-")}.${type}`);
   a.setAttribute("href", dataUrl);
   a.click();
 }
 
-const imageWidth = 1024;
-const imageHeight = 768;
-
 function DownloadButton() {
+  const [loading, setLoading] = useState<boolean>(false);
   const { getNodes } = useReactFlow();
   const { isLoaded } = useTfVizContext();
+
   const onClick = (type: "png" | "svg") => {
+    setLoading(true);
     // we calculate a transform for the nodes so that all nodes are visible
     // we then overwrite the transform of the `.react-flow__viewport` element
     // with the style option of the html-to-image library
     const nodesBounds = getNodesBounds(getNodes());
+    const imageWidth = nodesBounds.width + 100;
+    const imageHeight = nodesBounds.height + 100;
     const viewport = getViewportForBounds(
       nodesBounds,
       imageWidth,
@@ -48,7 +51,7 @@ function DownloadButton() {
     );
 
     const options: Options = {
-      backgroundColor: "#1a365d",
+      backgroundColor: "#141414",
       width: imageWidth,
       height: imageHeight,
       style: {
@@ -63,10 +66,16 @@ function DownloadButton() {
     );
     if (element === null) return;
     if (type === "png") {
-      toPng(element, options).then((f) => downloadImage(f, type));
+      toPng(element, options).then((f) => {
+        downloadImage(f, type);
+        setLoading(false);
+      });
     }
     if (type === "svg") {
-      toSvg(element, options).then((f) => downloadImage(f, type));
+      toSvg(element, options).then((f) => {
+        downloadImage(f, type);
+        setLoading(false);
+      });
     }
   };
 
@@ -79,6 +88,7 @@ function DownloadButton() {
           leftSection={<IconPhoto size={16} />}
           disabled={!isLoaded}
           className={helperClasses.disabledSubtleButton}
+          loading={loading}
         >
           Export
         </Button>
