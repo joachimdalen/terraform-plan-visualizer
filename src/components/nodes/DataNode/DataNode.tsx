@@ -45,9 +45,14 @@ function DataNode({ isConnectable, data, selected }: NodeProps<DataNode>) {
         isConnectable={isConnectable}
       />
       <Stack gap="0" flex={1} px="xs" pt="2">
-        <Text fz="sm" fw="bold" truncate w="190">
-          {data.name}
-        </Text>
+        <Group gap="5" wrap="nowrap">
+          <Text c="dimmed" fz="xs">
+            Name:
+          </Text>
+          <Text fz="xs" truncate w="150">
+            {data.name}
+          </Text>
+        </Group>
       </Stack>
       <Divider />
       <Box className={classes.footer}>
