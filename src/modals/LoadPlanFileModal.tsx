@@ -18,14 +18,24 @@ function LoadPlanFileModal({ onClose, onFileData }: Props) {
   const [fileContent, setFileContent] = useInputState<string>("");
 
   return (
-    <Modal opened={true} onClose={onClose} title="Load plan file" size="lg">
-      <Stack>
-        <Text>
+    <Modal
+      opened={true}
+      onClose={onClose}
+      title="Load plan file"
+      size="lg"
+      styles={{ title: { fontWeight: "bold" } }}
+    >
+      <Stack gap="xs">
+        <Text fz="sm">
           TfViz requires a json representation of your plan file to work
-          correctly{" "}
+          correctly.
         </Text>
-        <Text>Execute the following commands to generate the file</Text>
-        <Code block>{placeholder}</Code>
+        <Stack gap={0}>
+          <Text fz="sm" fw="bold">
+            Execute the following commands to generate the file
+          </Text>
+          <Code block>{placeholder}</Code>
+        </Stack>
 
         <JsonInput
           maxRows={20}
@@ -41,6 +51,7 @@ function LoadPlanFileModal({ onClose, onFileData }: Props) {
               onFileData(fileContent);
               onClose();
             }}
+            disabled={fileContent === ""}
           >
             Load
           </Button>

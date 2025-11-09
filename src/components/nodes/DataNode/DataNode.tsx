@@ -17,7 +17,7 @@ import providerIcons from "../../../provider-icons";
 import type { DataNode } from "../types";
 import classes from "./DataNode.module.css";
 
-function DataNode({ id, isConnectable, data, selected }: NodeProps<DataNode>) {
+function DataNode({ isConnectable, data, selected }: NodeProps<DataNode>) {
   function getIcon() {
     const provider = providerIcons[data.provider];
     if (provider === undefined) return null;

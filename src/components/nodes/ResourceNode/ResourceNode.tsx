@@ -1,5 +1,6 @@
 import {
   Avatar,
+  Badge,
   Box,
   Divider,
   Group,
@@ -7,23 +8,17 @@ import {
   Paper,
   Stack,
   Text,
-  ThemeIcon,
   Tooltip,
 } from "@mantine/core";
-import { IconComponents, IconTrash } from "@tabler/icons-react";
+import { IconComponents } from "@tabler/icons-react";
 import { Handle, Position, type NodeProps } from "@xyflow/react";
 import clsx from "clsx";
 import { memo } from "react";
 import providerIcons from "../../../provider-icons";
+import ChangeTypeIcon from "../../ChangeTypeIcon";
 import type { ResourceNode } from "../types";
 import classes from "./ResourceNode.module.css";
-function ResourceNode({
-  isConnectable,
-  data,
-  selected,
-  height,
-  width,
-}: NodeProps<ResourceNode>) {
+function ResourceNode({ data, selected }: NodeProps<ResourceNode>) {
   function getIcon() {
     const provider = providerIcons[data.provider];
     if (provider === undefined) return null;
@@ -41,19 +36,19 @@ function ResourceNode({
       className={clsx(classes.resourceNode, { [classes.active]: selected })}
     >
       <Box className={classes.header}>
-        <IconComponents size={24} />
-        <Text>Resource</Text>
+        <Group gap="0">
+          <IconComponents size={24} />
+          <Text>Resource</Text>
+        </Group>
+        <Tooltip label="The resource has drifted">
+          <Badge size="xs" color="grape.9" ml="auto" tt="none">
+            DRIFTED
+          </Badge>
+        </Tooltip>
       </Box>
-      <Handle
-        type="target"
-        position={Position.Left}
-        onConnect={(params) => console.log("handle onConnect", params)}
-        isConnectable={isConnectable}
-      />
+      <Handle type="target" position={Position.Left} />
       <Group flex={1} px="xs" pt="2" align="center" wrap="nowrap">
-        <ThemeIcon color="red" variant="light">
-          <IconTrash />
-        </ThemeIcon>
+        {data.changeType && <ChangeTypeIcon changeType={data.changeType} />}
         <Stack gap="0">
           <Group gap="5" wrap="nowrap">
             <Text c="dimmed" fz="xs">
@@ -90,12 +85,7 @@ function ResourceNode({
           </Tooltip>
         </Group>
       </Box>
-      {/* <Paper h={30} mt="auto" p={4}></Paper> */}
-      <Handle
-        type="source"
-        position={Position.Right}
-        isConnectable={isConnectable}
-      />
+      <Handle type="source" position={Position.Right} />
     </Paper>
   );
 }

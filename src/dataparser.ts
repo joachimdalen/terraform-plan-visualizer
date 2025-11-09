@@ -62,7 +62,7 @@ function parseModules(modules: { address: string; resources: TfResource[] }[]) {
       data: { name: module.address, index: module.index },
       width: 250 + 20 * module.resources.length,
       height: 115 * module.resources.length,
-      type: "labelNode",
+      type: "moduleNode",
     };
 
     const resourceNodes: Node[] = parseResources(module.resources).map((x) => ({

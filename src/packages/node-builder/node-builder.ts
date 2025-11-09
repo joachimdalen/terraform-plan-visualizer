@@ -5,19 +5,27 @@ import type {
   ModuleNode,
   ResourceNode,
 } from "../../components/nodes/types";
-import type { TfVizPlan, TfVizResource } from "../../tf-parser/tf-plan-parser";
 import { getDataId } from "../ids";
-import type { TfVizConfigPlan, TfVizConfigResource } from "../tf-parser/types";
+import type { TfVizPlan, TfVizResource } from "../tf-parser/tf-plan-parser";
+import type {
+  ChangeType,
+  TfVizConfigPlan,
+  TfVizConfigResource,
+} from "../tf-parser/types";
 
-const moduleNode = "labelNode";
+const moduleNode = "moduleNode";
 const resourceNode = "resourceNode";
 const dataNode = "dataNode";
 
-function buildResourceNode(resource: TfVizResource, idx: number) {
+function buildResourceNode(
+  resource: TfVizResource,
+  idx: number,
+  actions: Map<string, ChangeType>
+) {
   const node: Node<TfVizResource> = {
     id: resource.id,
     position: { x: 10, y: 100 * idx },
-    data: resource,
+    data: { ...resource, changeType: actions.get(resource.address) },
     type: resourceNode,
   };
   return node;
@@ -35,6 +43,7 @@ function buildDataNode(
       address: resource.address,
       name: resource.name,
       type: resource.type,
+      provider: resource.provider,
     },
     type: dataNode,
   };
@@ -52,9 +61,12 @@ function buildDataNode(
 
 function getNodesFromPlan2(
   plan: TfVizPlan,
-  config: TfVizConfigPlan
+  config: TfVizConfigPlan,
+  actions: Map<string, ChangeType>
 ): CustomNodeType[] {
-  const resourceNodes = plan.resources.map((r, i) => buildResourceNode(r, i));
+  const resourceNodes = plan.resources.map((r, i) =>
+    buildResourceNode(r, i, actions)
+  );
   const dataNodes = config.resources
     .filter((x) => x.mode === "data")
     .map((dn, i) => buildDataNode(dn, i));
@@ -71,7 +83,10 @@ function getNodesFromPlan2(
           position: { x: 10, y: (ri + 1) * 75 },
           parentId: modRest.id,
           extent: "parent",
-          data: res,
+          data: {
+            ...res,
+            changeType: actions.get(res.address),
+          },
         };
         return node;
       });

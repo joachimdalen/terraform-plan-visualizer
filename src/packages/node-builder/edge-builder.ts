@@ -10,6 +10,7 @@ import type { TfVizConfigPlan, TfVizConfigResource } from "../tf-parser/types";
 const edgeType = "smoothstep";
 
 function buildEdges(config: TfVizConfigPlan, nodes: CustomNodeType[]) {
+  console.log(nodes, config);
   let edges: Edge[] = [];
   for (const node of nodes) {
     if (node.id.startsWith("res-") && node.parentId === undefined) {
@@ -43,6 +44,18 @@ function buildEdges(config: TfVizConfigPlan, nodes: CustomNodeType[]) {
       edges = edges.concat(builtEdges);
       continue;
     }
+    if (node.id.startsWith("data-") && node.parentId === undefined) {
+      console.log("BUILDING");
+      const builtEdges = buildRootResourceEdge(
+        node as ResourceNode,
+        config,
+        nodes
+      );
+      if (builtEdges === undefined) continue;
+
+      edges = edges.concat(builtEdges);
+      continue;
+    }
   }
 
   //   const edge: Edge = {
@@ -65,10 +78,30 @@ function buildRootResourceEdge(
   if (node.data.module === undefined && node.data.index === undefined) {
     const nodeId = node.data.address;
     const configResource = config.resources.find((x) => x.address === nodeId);
-    if (configResource === undefined) return undefined;
 
+    if (configResource === undefined) return undefined;
+    if (configResource.dependsOn.length === 0) return undefined;
     console.log("configResource 1", configResource, nodeId);
-    return undefined;
+
+    for (const dependency of configResource.dependsOn) {
+      const relatedNodes = nodes.filter(
+        (x) => x.id != node.id && x.data.address === dependency
+      );
+
+      for (const relatedNode of relatedNodes) {
+        edges.push({
+          id: getEdgeId(),
+          source: relatedNode.id,
+          target: node.id,
+          type: edgeType,
+        });
+        console.log(edges);
+      }
+
+      console.log("relatedNodes", relatedNodes);
+    }
+
+    return edges;
   }
 
   // The node is not in a module and is used in for_each
@@ -82,12 +115,20 @@ function buildRootResourceEdge(
 
     console.log("configResource 2", configResource, node.data.index);
     for (const dependency of configResource.dependsOn) {
-      const relatedNodes = nodes.filter(
-        (x) =>
-          x.id != node.id &&
-          x.data.baseAddress === dependency &&
-          x.data.index === node.data.index
+      const dependencyResource = getDependencyFromPlan(dependency, config);
+      const relatedNodes = nodes.filter((x) =>
+        dependencyResource?.isLooped
+          ? x.id != node.id &&
+            x.data.baseAddress === dependency &&
+            x.data.index === node.data.index
+          : x.id != node.id && x.data.address === dependency
       );
+      // const relatedNodes = nodes.filter(
+      //   (x) =>
+      //     x.id != node.id &&
+      //     x.data.baseAddress === dependency &&
+      //     x.data.index === node.data.index
+      // );
 
       for (const relatedNode of relatedNodes) {
         edges.push({
@@ -95,6 +136,9 @@ function buildRootResourceEdge(
           source: relatedNode.id,
           target: node.id,
           type: edgeType,
+          data: {
+            label: dependency,
+          },
         });
       }
 

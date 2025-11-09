@@ -10,7 +10,7 @@ const icons: ProviderIcons = {
     azuread_access_package_catalog: identityGov,
     azuread_access_package: identityGov,
     azuread_group: entraGroup,
-    //azuread_access_package_assignment_policy: identityGov,
+    azuread_access_package_assignment_policy: identityGov,
   },
   ["microsoft/azuredevops"]: {
     default: devops,

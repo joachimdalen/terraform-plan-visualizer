@@ -3,8 +3,8 @@ import { IconPackage } from "@tabler/icons-react";
 import { Handle, Position, type NodeProps } from "@xyflow/react";
 import { memo } from "react";
 import type { ModuleNode } from "../types";
-import classes from "./LabeledGroupNode.module.css";
-function LabeledGroupNode({ data, height, width }: NodeProps<ModuleNode>) {
+import classes from "./ModuleNode.module.css";
+function ModuleNode({ data, height, width }: NodeProps<ModuleNode>) {
   return (
     <Paper withBorder className={classes.node} h={height} w={width}>
       <Handle
@@ -29,4 +29,4 @@ function LabeledGroupNode({ data, height, width }: NodeProps<ModuleNode>) {
   );
 }
 
-export default memo(LabeledGroupNode);
+export default memo(ModuleNode);

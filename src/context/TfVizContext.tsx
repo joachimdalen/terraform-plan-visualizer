@@ -12,8 +12,9 @@ import type { CustomNodeType } from "../components/nodes/types";
 import { buildEdges } from "../packages/node-builder/edge-builder";
 import { formatGraph } from "../packages/node-builder/graph-formatter";
 import { getNodesFromPlan2 } from "../packages/node-builder/node-builder";
+import { parseTfChangesPlan } from "../packages/tf-parser/tf-change-plan-parser";
 import { parseTfConfigPlan } from "../packages/tf-parser/tf-config-plan-parser";
-import { parseTfPlan } from "../tf-parser/tf-plan-parser";
+import { parseTfPlan } from "../packages/tf-parser/tf-plan-parser";
 
 type AppState = {
   nodes: CustomNodeType[];
@@ -39,7 +40,7 @@ const initialState: AppState = {
 
 const TfVizContext = createContext<AppState>(initialState);
 
-export type TfVizContextProps = PropsWithChildren<{}>;
+export type TfVizContextProps = PropsWithChildren;
 export function TfVizContextProvider({ children }: TfVizContextProps) {
   const [nodes, setIntNodes] = useState<CustomNodeType[]>([]);
   const [edges, setIntEdges] = useState<Edge[]>([]);
@@ -51,9 +52,11 @@ export function TfVizContextProvider({ children }: TfVizContextProps) {
     const jsonPlanFile = JSON.parse(planFile);
     const parsedJsonPlan = parseTfPlan(jsonPlanFile);
     const parsedJsonConfig = parseTfConfigPlan(jsonPlanFile);
+    const parsedActions = parseTfChangesPlan(jsonPlanFile);
     const nodesFromPlanAndConfig = getNodesFromPlan2(
       parsedJsonPlan,
-      parsedJsonConfig
+      parsedJsonConfig,
+      parsedActions
     );
     const nodeEdges = buildEdges(parsedJsonConfig, nodesFromPlanAndConfig);
     setIntNodes(nodesFromPlanAndConfig);
@@ -94,7 +97,9 @@ export function TfVizContextProvider({ children }: TfVizContextProps) {
 export function useTfVizContext() {
   const context = useContext(TfVizContext);
   if (context === undefined) {
-    throw new Error("useAppContext must be used within a AppContextProvider");
+    throw new Error(
+      "useTfVizContext must be used within a TfVizContextProvider"
+    );
   }
   return context;
 }

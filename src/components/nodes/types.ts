@@ -3,7 +3,7 @@ import type { DataNodeData } from "../../packages/node-builder/types";
 import type {
   TfVisModuleNoResources,
   TfVizResource,
-} from "../../tf-parser/tf-plan-parser";
+} from "../../packages/tf-parser/tf-plan-parser";
 
 export type DataNode = Node<DataNodeData>;
 export type ResourceNode = Node<TfVizResource>;

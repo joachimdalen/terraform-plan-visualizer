@@ -1,4 +1,4 @@
-import { AppShell, MantineProvider } from "@mantine/core";
+import { AppShell, createTheme, MantineProvider } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
 import { ReactFlowProvider } from "@xyflow/react";
 import { Header } from "./components/Header/Header";
@@ -6,8 +6,11 @@ import { TfVizContextProvider } from "./context/TfVizContext";
 import Editor from "./Editor";
 
 function App() {
+  const theme = createTheme({
+    fontFamily: '"K2D", sans-serif',
+  });
   return (
-    <MantineProvider defaultColorScheme="light">
+    <MantineProvider defaultColorScheme="light" theme={theme}>
       <Notifications />
       <AppShell
         padding="md"

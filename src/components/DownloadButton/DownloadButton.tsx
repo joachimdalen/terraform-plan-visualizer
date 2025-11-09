@@ -1,17 +1,28 @@
-import { Button } from "@mantine/core";
-import { IconPhoto } from "@tabler/icons-react";
+import {
+  Button,
+  Menu,
+  MenuDropdown,
+  MenuItem,
+  MenuTarget,
+} from "@mantine/core";
+import {
+  IconFileTypePng,
+  IconFileTypeSvg,
+  IconPhoto,
+} from "@tabler/icons-react";
 import {
   getNodesBounds,
   getViewportForBounds,
   useReactFlow,
 } from "@xyflow/react";
-import { toPng } from "html-to-image";
+import { toPng, toSvg } from "html-to-image";
+import type { Options } from "html-to-image/lib/types";
 import { useTfVizContext } from "../../context/TfVizContext";
-
-function downloadImage(dataUrl) {
+import helperClasses from "../helpers.module.css";
+function downloadImage(dataUrl: string, type: "png" | "svg") {
   const a = document.createElement("a");
 
-  a.setAttribute("download", "reactflow.png");
+  a.setAttribute("download", `reactflow.${type}`);
   a.setAttribute("href", dataUrl);
   a.click();
 }
@@ -22,7 +33,7 @@ const imageHeight = 768;
 function DownloadButton() {
   const { getNodes } = useReactFlow();
   const { isLoaded } = useTfVizContext();
-  const onClick = () => {
+  const onClick = (type: "png" | "svg") => {
     // we calculate a transform for the nodes so that all nodes are visible
     // we then overwrite the transform of the `.react-flow__viewport` element
     // with the style option of the html-to-image library
@@ -36,28 +47,58 @@ function DownloadButton() {
       5
     );
 
-    toPng(document.querySelector(".react-flow__viewport"), {
+    const options: Options = {
       backgroundColor: "#1a365d",
       width: imageWidth,
       height: imageHeight,
       style: {
-        width: imageWidth,
-        height: imageHeight,
+        width: imageWidth.toString(),
+        height: imageHeight.toString(),
         transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
       },
-    }).then(downloadImage);
+    };
+
+    const element = document.querySelector<HTMLElement>(
+      ".react-flow__viewport"
+    );
+    if (element === null) return;
+    if (type === "png") {
+      toPng(element, options).then((f) => downloadImage(f, type));
+    }
+    if (type === "svg") {
+      toSvg(element, options).then((f) => downloadImage(f, type));
+    }
   };
 
   return (
-    <Button
-      variant="subtle"
-      size="sm"
-      leftSection={<IconPhoto size={16} />}
-      onClick={onClick}
-      disabled={!isLoaded}
-    >
-      Download
-    </Button>
+    <Menu shadow="md" width={200} withArrow>
+      <MenuTarget>
+        <Button
+          variant="subtle"
+          size="sm"
+          leftSection={<IconPhoto size={16} />}
+          disabled={!isLoaded}
+          className={helperClasses.disabledSubtleButton}
+        >
+          Export
+        </Button>
+      </MenuTarget>
+
+      <MenuDropdown>
+        <MenuItem
+          leftSection={<IconFileTypeSvg size={16} />}
+          onClick={() => onClick("svg")}
+        >
+          SVG
+        </MenuItem>
+        <MenuItem
+          leftSection={<IconFileTypePng size={16} />}
+          onClick={() => onClick("png")}
+        >
+          PNG
+        </MenuItem>
+      </MenuDropdown>
+    </Menu>
   );
 }
 

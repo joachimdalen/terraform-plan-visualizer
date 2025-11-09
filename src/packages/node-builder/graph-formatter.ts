@@ -9,6 +9,7 @@ import {
   type CustomNodeType,
 } from "../../components/nodes/types";
 const dir = "RIGHT";
+const moduleDir = "RIGHT";
 
 type NodeLayoutPosition = {
   x: number;
@@ -51,7 +52,7 @@ async function formatGraph(
     "elk.layered.spacing.nodeNodeBetweenLayers": "100",
     "elk.layered.nodePlacement.strategy": "SIMPLE",
     "elk.spacing.nodeNode": "40",
-    // "elk.edgeRouting": "SPINES",
+    "elk.edgeRouting": "SPINES",
   };
 
   const keys = Array.from(grouped.keys());
@@ -72,7 +73,10 @@ async function formatGraph(
 
     const graph: ElkNode = {
       id: "root",
-      layoutOptions: baseOptions,
+      layoutOptions: {
+        ...baseOptions,
+        "elk.direction": moduleDir,
+      },
       children: elkNodes,
       edges: edgesForResources.map((edge: Edge) => ({
         id: edge.id,
@@ -85,27 +89,30 @@ async function formatGraph(
     if (!layout.children) continue;
 
     nodePositions.set(moduleKey, {
-      x: layout.x,
-      y: layout.y,
+      x: layout.x || 500,
+      y: layout.y || 500,
     });
     nodeSizes.set(moduleKey, {
-      width: layout.width,
+      width: layout.width || 100,
       height: (layout.height || 0) + ModuleNodeExtraHeight,
     });
 
     for (const child of layout.children) {
       nodePositions.set(child.id, {
-        x: child.x,
+        x: child.x || 100,
         y: (child.y || 0) + ModuleNodeOffsetY,
       });
       nodeSizes.set(child.id, {
-        width: child.width,
-        height: child.height,
+        width: child.width || 100,
+        height: child.height || 100,
       });
     }
   }
 
   const rootNodes = grouped.get("root");
+  if (rootNodes === undefined) {
+    throw Error("Failed to get root node");
+  }
   const nodeIds = rootNodes.map((x) => x.id);
   const edgesForResources = getEdgesForNodes(edges, nodeIds);
 
@@ -141,12 +148,12 @@ async function formatGraph(
   if (layout.children) {
     for (const child of layout.children) {
       nodePositions.set(child.id, {
-        x: child.x,
-        y: child.y,
+        x: child.x || 100,
+        y: child.y || 100,
       });
       nodeSizes.set(child.id, {
-        width: child.width,
-        height: child.height,
+        width: child.width || 100,
+        height: child.height || 100,
       });
     }
   }

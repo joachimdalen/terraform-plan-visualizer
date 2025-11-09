@@ -1,21 +1,34 @@
+import { getDataId, getModuleId, getResourceId } from "../ids";
 import type {
   ConfigResource,
   Expression,
   ModuleCall,
   Plan,
-} from "../../tf-parser/types";
-import { getDataId, getModuleId, getResourceId } from "../ids";
-import type {
   TfVizConfigPlan,
   TfVizConfigResource,
   TfVizModuleCall,
 } from "./types";
 
+function parseProviders(planFile: Plan): { name: string; value: string }[] {
+  if (!planFile.configuration?.provider_config) return [];
+  const keys = Object.keys(planFile.configuration.provider_config);
+  return keys.map((k) => {
+    const p = planFile.configuration!.provider_config![k];
+    return {
+      name: k,
+      value: p.full_name
+        ? p.full_name.replace("registry.terraform.io/", "")
+        : k,
+    };
+  });
+}
+
 function parseTfConfigPlan(planFile: Plan): TfVizConfigPlan {
   const resources: TfVizConfigResource[] = [];
   const modules: TfVizModuleCall[] = [];
+  const providers = parseProviders(planFile);
   for (const res of planFile.configuration?.root_module?.resources || []) {
-    resources.push(parseTfResource(res));
+    resources.push(parseTfResource(res, providers));
   }
   if (planFile.configuration?.root_module?.module_calls != undefined) {
     for (const moduleName of Object.keys(
@@ -24,7 +37,7 @@ function parseTfConfigPlan(planFile: Plan): TfVizConfigPlan {
       const module =
         planFile.configuration.root_module.module_calls[moduleName];
 
-      modules.push(parseTfModule(moduleName, module));
+      modules.push(parseTfModule(moduleName, module, providers));
     }
   }
 
@@ -34,9 +47,15 @@ function parseTfConfigPlan(planFile: Plan): TfVizConfigPlan {
   };
 }
 
-function parseTfResource(resource: ConfigResource) {
+function parseTfResource(
+  resource: ConfigResource,
+  providers: { name: string; value: string }[]
+) {
   const address = getValueOrThow(resource.address);
   const mode = getValueOrThow(resource.mode);
+  const provider = providers.find(
+    (x) => x.name === getValueOrThow(resource.provider_config_key)
+  );
 
   const res: TfVizConfigResource = {
     id: mode === "data" ? getDataId() : getResourceId(),
@@ -44,7 +63,7 @@ function parseTfResource(resource: ConfigResource) {
     mode: mode as "managed" | "data",
     name: getValueOrThow(resource.name),
     type: getValueOrThow(resource.type),
-    provider: getValueOrThow(resource.provider_config_key),
+    provider: provider!.value!,
     isLooped: resource.for_each_expression !== undefined,
     dependsOn: getDependencies(resource.expressions),
   };
@@ -55,8 +74,6 @@ function parseTfResource(resource: ConfigResource) {
 function onlyUnique(value: string, index: number, array: string[]) {
   return array.indexOf(value) === index;
 }
-
-function getNestedKeys(expressions?: Record<string, Expression>) {}
 
 function getDependencies(expressions?: Record<string, Expression>): string[] {
   if (expressions === undefined) return [];
@@ -77,7 +94,8 @@ function getDependencies(expressions?: Record<string, Expression>): string[] {
       if (
         ref.startsWith("local.") ||
         ref.startsWith("each.") ||
-        ref.startsWith("var.")
+        ref.startsWith("var.") ||
+        ref.startsWith("path.")
       )
         continue;
 
@@ -87,6 +105,7 @@ function getDependencies(expressions?: Record<string, Expression>): string[] {
         dependencies.push(ref);
       }
       if (segments.length === 3 && ref.startsWith("data.")) {
+        console.log("Pushing data reference", ref);
         dependencies.push(ref);
       }
     }
@@ -95,57 +114,18 @@ function getDependencies(expressions?: Record<string, Expression>): string[] {
   return dependencies.filter(onlyUnique);
 }
 
-function getDependenciesRec(
-  expressions?: Record<string, Expression>,
-  deps: string[] = []
+function parseTfModule(
+  name: string,
+  module: ModuleCall,
+  providers: { name: string; value: string }[]
 ) {
-  if (expressions === undefined) return [];
-  const dependencies = deps;
-  const expKeys = Object.keys(expressions);
-  for (const expKey of expKeys) {
-    const exp = expressions[expKey];
-    console.log("exp_key", exp);
-    if (!Array.isArray(exp)) {
-      if (exp.references === undefined) continue;
-
-      for (const ref of exp.references) {
-        console.log("ref", ref);
-        if (
-          ref.startsWith("local.") ||
-          ref.startsWith("each.") ||
-          ref.startsWith("var.")
-        )
-          continue;
-
-        const segments = ref.split(".");
-
-        if (segments.length == 2) {
-          dependencies.push(ref);
-        }
-        if (segments.length === 3 && ref.startsWith("data.")) {
-          dependencies.push(ref);
-        }
-      }
-    } else {
-      // TODO: Should maybe use recursion here?
-      console.log("DEPS", expKey, dependencies);
-      return [...dependencies, ...getDependenciesRec(exp, dependencies)];
-      // console.log("GOT NEXT", exp, eps);
-      // dependencies.push(...eps);
-    }
-  }
-  console.log([...deps, dependencies.filter(onlyUnique)]);
-
-  return dependencies; //.filter(onlyUnique);
-}
-
-function parseTfModule(name: string, module: ModuleCall) {
   const mod: TfVizModuleCall = {
     id: getModuleId(),
     name,
     dependsOn: getDependencies(module.expressions),
     isLooped: module.for_each_expression !== undefined,
-    resources: module.module?.resources?.map(parseTfResource) ?? [],
+    resources:
+      module.module?.resources?.map((r) => parseTfResource(r, providers)) ?? [],
   };
 
   return mod;
