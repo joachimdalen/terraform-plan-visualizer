@@ -22,6 +22,7 @@ export type ModuleNodeProps = {
   type: string;
   provider: string;
 };
+
 export type DataNodeProps = {
   name: string;
   type: string;
