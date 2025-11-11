@@ -1,3 +1,4 @@
+import { readLocalStorageValue } from "@mantine/hooks";
 import { useReactFlow, type Edge } from "@xyflow/react";
 import {
   createContext,
@@ -10,7 +11,11 @@ import {
 } from "react";
 import type { CustomNodeType } from "../components/nodes/types";
 import { buildEdges } from "../packages/node-builder/edge-builder";
-import { formatGraph } from "../packages/node-builder/graph-formatter";
+import {
+  defaultGraphOptions,
+  formatGraph,
+  type GraphFormatterOptions,
+} from "../packages/node-builder/graph-formatter";
 import { getNodesFromPlan2 } from "../packages/node-builder/node-builder";
 import { parseTfChangesPlan } from "../packages/tf-parser/tf-change-plan-parser";
 import { parseTfConfigPlan } from "../packages/tf-parser/tf-config-plan-parser";
@@ -22,8 +27,9 @@ type AppState = {
   setNodes: Dispatch<SetStateAction<CustomNodeType[]>>;
   setEdges: Dispatch<SetStateAction<Edge[]>>;
   loadFile: (fileContent: string) => void;
-  reformat: () => void;
+  reformat: (options?: Partial<GraphFormatterOptions>) => void;
   isLoaded: boolean;
+  formatterOptions: GraphFormatterOptions;
 };
 
 const initialState: AppState = {
@@ -36,6 +42,7 @@ const initialState: AppState = {
   loadFile: () => {},
   reformat: () => {},
   isLoaded: false,
+  formatterOptions: defaultGraphOptions,
 };
 
 const TfVizContext = createContext<AppState>(initialState);
@@ -45,6 +52,13 @@ export function TfVizContextProvider({ children }: TfVizContextProps) {
   const [nodes, setIntNodes] = useState<CustomNodeType[]>([]);
   const [edges, setIntEdges] = useState<Edge[]>([]);
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
+  const [formatterOptions, setFormatterOptions] =
+    useState<GraphFormatterOptions>(
+      readLocalStorageValue<GraphFormatterOptions>({
+        key: "terraform-plan-visualizer-settings",
+        defaultValue: defaultGraphOptions,
+      })
+    );
 
   const { fitView } = useReactFlow();
 
@@ -64,17 +78,28 @@ export function TfVizContextProvider({ children }: TfVizContextProps) {
     setIsLoaded(true);
   }, []);
 
-  const reformat = useCallback(() => {
-    formatGraph(nodes, edges).then((res) => {
-      setIntNodes(res);
-      fitView();
-    });
-    // createLayout(nodes, edges).then((res) => {
-    //   setIntNodes(res?.nodes);
-    //   setIntEdges(res?.edges);
-    //   fitView();
-    // });
-  }, [nodes, edges]);
+  const reformat = useCallback(
+    (options?: Partial<GraphFormatterOptions>) => {
+      const fullOptions = {
+        ...formatterOptions,
+        ...options,
+      };
+      if (options) {
+        setFormatterOptions(fullOptions);
+      }
+      formatGraph(nodes, edges, fullOptions).then((res) => {
+        setIntNodes(res);
+
+        fitView();
+      });
+      // createLayout(nodes, edges).then((res) => {
+      //   setIntNodes(res?.nodes);
+      //   setIntEdges(res?.edges);
+      //   fitView();
+      // });
+    },
+    [nodes, edges, fitView]
+  );
 
   return (
     <TfVizContext.Provider
@@ -86,6 +111,7 @@ export function TfVizContextProvider({ children }: TfVizContextProps) {
         loadFile,
         reformat,
         isLoaded,
+        formatterOptions,
       }}
     >
       {children}

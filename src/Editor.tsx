@@ -10,7 +10,12 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconEye, IconFileUpload, IconHierarchy } from "@tabler/icons-react";
+import {
+  IconEye,
+  IconFileUpload,
+  IconHierarchy,
+  IconSettings,
+} from "@tabler/icons-react";
 import { useReactFlow } from "@xyflow/react";
 import { useState } from "react";
 import Vizualiser2 from "./Vizualiser2";
@@ -19,11 +24,14 @@ import helperClasses from "./components/helpers.module.css";
 import type { CustomNodeType } from "./components/nodes/types";
 import { useTfVizContext } from "./context/TfVizContext";
 import LoadPlanFileModal from "./modals/LoadPlanFileModal";
+import SettingsModal from "./modals/SettingsModal";
+
 function Editor() {
   const [selectedNode, setSelectedNode] = useState<CustomNodeType | undefined>(
     undefined
   );
   const [opened, { open, close }] = useDisclosure(false);
+  const [showSettings, settingsHandlers] = useDisclosure(false);
   const { loadFile, reformat, isLoaded } = useTfVizContext();
   const { fitView } = useReactFlow();
 
@@ -44,23 +52,32 @@ function Editor() {
             variant="subtle"
             size="sm"
             leftSection={<IconHierarchy size={16} />}
-            onClick={reformat}
+            onClick={() => reformat()}
             disabled={!isLoaded}
             className={helperClasses.disabledSubtleButton}
           >
             Reformat
           </Button>
         </Group>
-        <Group>
+        <Group gap="xs">
           <Tooltip label="Fit view">
             <ActionIcon
               variant="subtle"
-              color="blue.5"
+              color="blue"
               onClick={() => fitView()}
               disabled={!isLoaded}
               className={helperClasses.disabledSubtleButton}
             >
-              <IconEye />
+              <IconEye size={16} />
+            </ActionIcon>
+          </Tooltip>
+          <Tooltip label="Settings">
+            <ActionIcon
+              variant="subtle"
+              color="blue"
+              onClick={settingsHandlers.open}
+            >
+              <IconSettings size={16} />
             </ActionIcon>
           </Tooltip>
           <DownloadButton />
@@ -138,8 +155,14 @@ function Editor() {
           </Stack>
         </Drawer>
       )}
-      {opened && (
+      {(opened || !isLoaded) && (
         <LoadPlanFileModal onClose={close} onFileData={(fc) => loadFile(fc)} />
+      )}
+      {showSettings && (
+        <SettingsModal
+          onClose={settingsHandlers.close}
+          onSaved={(settings) => reformat(settings)}
+        />
       )}
     </Stack>
   );

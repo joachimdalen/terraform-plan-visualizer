@@ -8,8 +8,19 @@ import {
   ModuleNodeOffsetY,
   type CustomNodeType,
 } from "../../components/nodes/types";
-const dir = "RIGHT";
-const moduleDir = "RIGHT";
+
+export type GraphFormatterOptions = {
+  direction: string;
+  moduleDirection: string;
+  layerSpacing: number;
+  nodeSpacing: number;
+};
+export const defaultGraphOptions: GraphFormatterOptions = {
+  direction: "RIGHT",
+  moduleDirection: "DOWN",
+  layerSpacing: 100,
+  nodeSpacing: 40,
+};
 
 type NodeLayoutPosition = {
   x: number;
@@ -39,7 +50,8 @@ function groupBy(
 
 async function formatGraph(
   nodes: CustomNodeType[],
-  edges: Edge[]
+  edges: Edge[],
+  options: GraphFormatterOptions
 ): Promise<CustomNodeType[]> {
   const elk = new ELK();
   const grouped = groupBy(nodes, (n) => n.parentId);
@@ -48,10 +60,11 @@ async function formatGraph(
 
   const baseOptions: LayoutOptions = {
     "elk.algorithm": "layered",
-    "elk.direction": dir,
-    "elk.layered.spacing.nodeNodeBetweenLayers": "100",
+    "elk.direction": options.direction,
+    "elk.layered.spacing.nodeNodeBetweenLayers":
+      options.layerSpacing.toString(),
     "elk.layered.nodePlacement.strategy": "SIMPLE",
-    "elk.spacing.nodeNode": "40",
+    "elk.spacing.nodeNode": options.nodeSpacing.toString(),
     "elk.edgeRouting": "SPINES",
   };
 
@@ -75,7 +88,7 @@ async function formatGraph(
       id: "root",
       layoutOptions: {
         ...baseOptions,
-        "elk.direction": moduleDir,
+        "elk.direction": options.moduleDirection,
       },
       children: elkNodes,
       edges: edgesForResources.map((edge: Edge) => ({
@@ -158,13 +171,6 @@ async function formatGraph(
     }
   }
 
-  // Format resources in modules
-  // Set size of module node (+ offsets)
-  // Format root module
-  // Report back size and position
-
-  console.log(grouped, nodePositions, nodeSizes);
-
   return nodes.map((n) => {
     const pos = nodePositions.get(n.id);
     const size = nodeSizes.get(n.id);
@@ -183,15 +189,10 @@ async function formatGraph(
   });
 }
 
-function getEdgesForSubSection(edges: Edge[], currentId: string): Edge[] {
-  return edges.filter((x) => x.source === currentId || x.target === currentId);
-}
 function getEdgesForNodes(edges: Edge[], nodeIds: string[]): Edge[] {
   return edges.filter(
     (x) => nodeIds.includes(x.source) || nodeIds.includes(x.target)
   );
 }
-
-//function formatCluster() {}
 
 export { formatGraph };
