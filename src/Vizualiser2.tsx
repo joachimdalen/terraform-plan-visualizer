@@ -39,12 +39,10 @@ function Vizualiser2({ onNodeSelect }: Props) {
   });
   const highlightNodeDependencies = useCallback(
     (nodeId: string, isSelected: boolean) => {
-      console.log("isSelected", isSelected);
       const nodeType = nodes.find((x) => x.id === nodeId)?.type;
       const outgoers = getOutgoers({ id: nodeId }, nodes, edges).map(
         (x) => x.id
       );
-      console.log("outgoers", outgoers);
       const changedEdges: EdgeChange<Edge>[] = edges
         .filter((x) => x.source === nodeId && outgoers.includes(x.target))
         .map((e) => ({
@@ -68,10 +66,6 @@ function Vizualiser2({ onNodeSelect }: Props) {
           };
           return change;
         });
-      console.log({
-        nodeId: nodeId,
-        edges: changedEdges,
-      });
       return changedEdges;
     },
     [nodes, edges]
@@ -93,12 +87,10 @@ function Vizualiser2({ onNodeSelect }: Props) {
   const onNodesChange: OnNodesChange<CustomNodeType> = useCallback(
     (changes) => {
       const selectedNodes = changes.filter((x) => x.type === "select");
-      console.log("selectedNodes", selectedNodes);
       if (selectedNodes.length > 0) {
         const changedEdges = selectedNodes.flatMap((node) => {
           return highlightNodeDependencies(node.id, node.selected || false);
         });
-        console.log("changedEdges", changedEdges);
         if (changedEdges.length > 0) {
           onEdgesChange(changedEdges);
         }

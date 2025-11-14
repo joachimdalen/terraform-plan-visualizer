@@ -76,6 +76,22 @@ function SettingsModal({ onClose, onSaved }: Props) {
             onChange={(e) => setState({ nodeSpacing: parseInt(e.toString()) })}
           />
         </Group>
+        <Group grow>
+          <Select
+            label="Node placement strategy"
+            description="The strategy to use for placing nodes"
+            data={[
+              "SIMPLE",
+              "LINEAR_SEGMENTS",
+              "BRANDES_KOEPF",
+              "NETWORK_SIMPLEX",
+            ]}
+            value={state.nodePlacementStrategy}
+            onChange={(e) => setState({ nodePlacementStrategy: e ?? "SIMPLE" })}
+            allowDeselect={false}
+            withCheckIcon={false}
+          />
+        </Group>
 
         <Group justify="end">
           <Button

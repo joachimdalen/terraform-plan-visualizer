@@ -14,12 +14,14 @@ export type GraphFormatterOptions = {
   moduleDirection: string;
   layerSpacing: number;
   nodeSpacing: number;
+  nodePlacementStrategy: string;
 };
 export const defaultGraphOptions: GraphFormatterOptions = {
   direction: "RIGHT",
   moduleDirection: "DOWN",
   layerSpacing: 100,
   nodeSpacing: 40,
+  nodePlacementStrategy: "SIMPLE",
 };
 
 type NodeLayoutPosition = {
@@ -63,9 +65,10 @@ async function formatGraph(
     "elk.direction": options.direction,
     "elk.layered.spacing.nodeNodeBetweenLayers":
       options.layerSpacing.toString(),
-    "elk.layered.nodePlacement.strategy": "SIMPLE",
+    "elk.layered.nodePlacement.strategy": options.nodePlacementStrategy,
+    "elk.layered.wrapping.strategy": "MULTI_EDGE",
     "elk.spacing.nodeNode": options.nodeSpacing.toString(),
-    "elk.edgeRouting": "SPINES",
+    "elk.edgeRouting": "SPLINES",
   };
 
   const keys = Array.from(grouped.keys());

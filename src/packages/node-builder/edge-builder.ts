@@ -45,7 +45,6 @@ function buildEdges(config: TfVizConfigPlan, nodes: CustomNodeType[]) {
       continue;
     }
     if (node.id.startsWith("data-") && node.parentId === undefined) {
-      console.log("BUILDING");
       const builtEdges = buildRootResourceEdge(
         node as ResourceNode,
         config,
@@ -81,7 +80,6 @@ function buildRootResourceEdge(
 
     if (configResource === undefined) return undefined;
     if (configResource.dependsOn.length === 0) return undefined;
-    console.log("configResource 1", configResource, nodeId);
 
     for (const dependency of configResource.dependsOn) {
       const relatedNodes = nodes.filter(
@@ -95,10 +93,7 @@ function buildRootResourceEdge(
           target: node.id,
           type: edgeType,
         });
-        console.log(edges);
       }
-
-      console.log("relatedNodes", relatedNodes);
     }
 
     return edges;
@@ -113,7 +108,6 @@ function buildRootResourceEdge(
     if (configResource === undefined) return undefined;
     if (configResource.dependsOn.length === 0) return undefined;
 
-    console.log("configResource 2", configResource, node.data.index);
     for (const dependency of configResource.dependsOn) {
       const dependencyResource = getDependencyFromPlan(dependency, config);
       const relatedNodes = nodes.filter((x) =>
@@ -141,8 +135,6 @@ function buildRootResourceEdge(
           },
         });
       }
-
-      console.log("relatedNodes", relatedNodes);
     }
   }
   return edges;
@@ -155,13 +147,10 @@ function buildModuleResourceEdge(
   const edges: Edge[] = [];
   const parent = nodes.find((x) => x.id === node.parentId);
   if (parent === undefined) return undefined;
-  console.log("PARENT", parent);
   const module = config.modules.find(
     (x) => x.name === parent.data.baseAddress.replace("module.", "")
   );
   if (module === undefined) return undefined;
-  console.log("MODULE", module);
-  console.log("CURRENT", node);
   const configResource = module.resources.find(
     (x) =>
       x.address === node.data.baseAddress.replace(`module.${module.name}.`, "")
@@ -175,7 +164,6 @@ function buildModuleResourceEdge(
         (x.data.baseAddress?.replace(`module.${module.name}.`, "") ||
           x.data.address) === dependency
     );
-    console.log("RELATED", relatedNodes);
 
     for (const relatedNode of relatedNodes) {
       edges.push({
@@ -185,10 +173,7 @@ function buildModuleResourceEdge(
         type: edgeType,
       });
     }
-
-    console.log("relatedNodes", relatedNodes);
   }
-  console.log("RES", configResource);
   return edges;
 }
 
@@ -198,10 +183,10 @@ function buildModuleEdge(
   nodes: CustomNodeType[]
 ): Edge[] | undefined {
   const edges: Edge[] = [];
-  if (node.data.index === undefined) {
-    console.log("not indexed");
-    return undefined;
-  }
+  // if (node.data.index === undefined) {
+  //   console.log("not indexed");
+  //   return undefined;
+  // }
   const module = config.modules.find(
     (x) => x.name === node.data.baseAddress.replace("module.", "")
   );
@@ -217,7 +202,7 @@ function buildModuleEdge(
           x.data.index === node.data.index
         : x.id != node.id && x.data.baseAddress === dependency
     );
-
+    console.log(node.data.name, dependency, relatedNodes);
     for (const relatedNode of relatedNodes) {
       edges.push({
         id: getEdgeId(),
@@ -226,11 +211,7 @@ function buildModuleEdge(
         type: edgeType,
       });
     }
-
-    console.log("relatedNodes", relatedNodes);
   }
-
-  console.log("NODE D", node.data, module);
   return edges;
 }
 
