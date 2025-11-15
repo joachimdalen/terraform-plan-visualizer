@@ -18,12 +18,20 @@ function ModuleNode({ data, height, width }: NodeProps<ModuleNode>) {
       </Box>
       <Handle type="source" position={Position.Bottom} />
       <Box className={classes.footer}>
-        <Group wrap="nowrap" align="center" gap="xs">
-          <Text fz="sm" fw="bold" truncate w="250">
-            {data.index ? `${data.index} - ${data.name}` : data.name}
+        <Group gap="5" wrap="nowrap">
+          <Text c="dimmed" fz="xs">
+            Name:
           </Text>
-          <Text fz="xs">{data.baseAddress}</Text>
+          <Text fz="xs">{data.name}</Text>
         </Group>
+        {data.index && (
+          <Group gap="5" wrap="nowrap">
+            <Text c="dimmed" fz="xs">
+              Index:
+            </Text>
+            <Text fz="xs">{data.index}</Text>
+          </Group>
+        )}
       </Box>
     </Paper>
   );
