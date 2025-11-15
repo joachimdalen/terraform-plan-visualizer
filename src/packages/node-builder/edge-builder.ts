@@ -6,8 +6,7 @@ import type {
 } from "../../components/nodes/types";
 import { getEdgeId } from "../ids";
 import type { TfVizConfigPlan, TfVizConfigResource } from "../tf-parser/types";
-
-const edgeType = "smoothstep";
+import { dataNodeName, edgeType } from "./graphConstants";
 
 function buildEdges(config: TfVizConfigPlan, nodes: CustomNodeType[]) {
   let edges: Edge[] = [];
@@ -56,13 +55,6 @@ function buildEdges(config: TfVizConfigPlan, nodes: CustomNodeType[]) {
     }
   }
 
-  //   const edge: Edge = {
-  //     id: getEdgeId(),
-  //     source: sn.id,
-  //     target: tn.id,
-  //     type: "step",
-  //   };
-  //   return edge;
   return edges;
 }
 
@@ -109,19 +101,17 @@ function buildRootResourceEdge(
 
     for (const dependency of configResource.dependsOn) {
       const dependencyResource = getDependencyFromPlan(dependency, config);
-      const relatedNodes = nodes.filter((x) =>
-        dependencyResource?.isLooped
-          ? x.id != node.id &&
-            x.data.baseAddress === dependency &&
-            x.data.index === node.data.index
-          : x.id != node.id && x.data.address === dependency
-      );
-      // const relatedNodes = nodes.filter(
-      //   (x) =>
-      //     x.id != node.id &&
-      //     x.data.baseAddress === dependency &&
-      //     x.data.index === node.data.index
-      // );
+      const relatedNodes = nodes.filter((x) => {
+        if (!dependencyResource?.isLooped || x.type === dataNodeName) {
+          return x.id != node.id && x.data.address === dependency;
+        }
+        const y = x as ResourceNode;
+        return (
+          y.id != node.id &&
+          y.data.baseAddress === dependency &&
+          y.data.index === node.data.index
+        );
+      });
 
       for (const relatedNode of relatedNodes) {
         edges.push({
@@ -144,25 +134,44 @@ function buildModuleResourceEdge(
   nodes: CustomNodeType[]
 ): Edge[] | undefined {
   const edges: Edge[] = [];
-  const parent = nodes.find((x) => x.id === node.parentId);
+  const parent = nodes.find((x) => x.id === node.parentId) as ModuleNode;
   if (parent === undefined) return undefined;
   const module = config.modules.find(
     (x) => x.name === parent.data.baseAddress.replace("module.", "")
   );
   if (module === undefined) return undefined;
   const configResource = module.resources.find(
-    (x) =>
-      x.address === node.data.baseAddress.replace(`module.${module.name}.`, "")
+    (x) => x.address === trimModuleName(node.data.baseAddress, module.name)
   );
   if (configResource === undefined) return undefined;
   for (const dependency of configResource.dependsOn) {
-    const relatedNodes = nodes.filter(
-      (x) =>
-        x.parentId === node.parentId &&
-        x.id != node.id &&
-        (x.data.baseAddress?.replace(`module.${module.name}.`, "") ||
-          x.data.address) === dependency
-    );
+    const dependencyResource = getDependencyFromPlan(dependency, config);
+    const relatedNodes = nodes.filter((x) => {
+      if (x.type === dataNodeName) {
+        return (
+          x.parentId === node.parentId &&
+          x.id != node.id &&
+          x.data.address === dependency
+        );
+      }
+      const y = x as ResourceNode;
+      if (dependencyResource?.isLooped) {
+        return (
+          y.parentId === node.parentId &&
+          y.id != node.id &&
+          (trimModuleName(y.data.baseAddress, module.name) ||
+            y.data.address) === dependency &&
+          y.data.index === node.data.index
+        );
+      }
+
+      return (
+        y.parentId === node.parentId &&
+        y.id != node.id &&
+        (trimModuleName(y.data.baseAddress, module.name) || y.data.address) ===
+          dependency
+      );
+    });
 
     for (const relatedNode of relatedNodes) {
       edges.push({
@@ -191,13 +200,22 @@ function buildModuleEdge(
 
   for (const dependency of module.dependsOn) {
     const dependencyResource = getDependencyFromPlan(dependency, config);
-    const relatedNodes = nodes.filter((x) =>
-      dependencyResource?.isLooped
-        ? x.id != node.id &&
-          x.data.baseAddress === dependency &&
-          x.data.index === node.data.index
-        : x.id != node.id && x.data.baseAddress === dependency
-    );
+
+    const relatedNodes = nodes.filter((x) => {
+      if (x.type === dataNodeName) {
+        return x.id != node.id && x.data.address === dependency;
+      }
+      const y = x as ResourceNode;
+      if (dependencyResource?.isLooped) {
+        return (
+          y.id != node.id &&
+          y.data.baseAddress === dependency &&
+          y.data.index === node.data.index
+        );
+      }
+
+      return y.id != node.id && y.data.baseAddress === dependency;
+    });
 
     for (const relatedNode of relatedNodes) {
       edges.push({
@@ -218,10 +236,18 @@ function getDependencyFromPlan(
   const item = config.resources.find((x) => x.address === dependency);
   if (item !== undefined) return item;
   for (const mod of config.modules) {
-    const modItem = mod.resources.find((x) => x.address === dependency);
+    const modItem = mod.resources.find(
+      (x) => trimModuleName(x.address) === dependency
+    );
     if (modItem !== undefined) return modItem;
   }
   return undefined;
+}
+
+function trimModuleName(address: string, name?: string) {
+  if (name) return address.replace(`module.${name}.`, "");
+  const parts = address.split(".");
+  return parts.slice(0, 2).join(".");
 }
 
 export { buildEdges };

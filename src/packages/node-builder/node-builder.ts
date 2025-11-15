@@ -8,17 +8,18 @@ import type {
 import { getDataId } from "../ids";
 import type { TfVizPlan, TfVizResource } from "../tf-parser/tf-plan-parser";
 import type { TfVizConfigPlan, TfVizConfigResource } from "../tf-parser/types";
-
-const moduleNode = "moduleNode";
-const resourceNode = "resourceNode";
-const dataNode = "dataNode";
+import {
+  dataNodeName,
+  moduleNodeName,
+  resourceNodeName,
+} from "./graphConstants";
 
 function buildResourceNode(resource: TfVizResource, idx: number) {
   const node: Node<TfVizResource> = {
     id: resource.id,
     position: { x: 10, y: 100 * idx },
     data: resource,
-    type: resourceNode,
+    type: resourceNodeName,
   };
   return node;
 }
@@ -37,7 +38,7 @@ function buildDataNode(
       type: resource.type,
       provider: resource.provider,
     },
-    type: dataNode,
+    type: dataNodeName,
   };
 
   if (parentId) {
@@ -51,7 +52,7 @@ function buildDataNode(
   return node;
 }
 
-function getNodesFromPlan2(
+function getNodesFromPlan(
   plan: TfVizPlan,
   config: TfVizConfigPlan
 ): CustomNodeType[] {
@@ -68,7 +69,7 @@ function getNodesFromPlan2(
       const moduleResources = resources.map((res, ri) => {
         const node: ResourceNode = {
           id: res.id,
-          type: resourceNode,
+          type: resourceNodeName,
           position: { x: 10, y: (ri + 1) * 75 },
           parentId: modRest.id,
           extent: "parent",
@@ -94,7 +95,7 @@ function getNodesFromPlan2(
         },
         width: 500,
         height: 500,
-        type: moduleNode,
+        type: moduleNodeName,
       };
       return [group, ...moduleResources, ...moduleData];
     }
@@ -102,4 +103,4 @@ function getNodesFromPlan2(
 
   return [...resourceNodes, ...dataNodes, ...moduleNodesAndResources];
 }
-export { getNodesFromPlan2 };
+export { getNodesFromPlan };

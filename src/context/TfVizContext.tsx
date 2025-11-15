@@ -16,7 +16,7 @@ import {
   formatGraph,
   type GraphFormatterOptions,
 } from "../packages/node-builder/graph-formatter";
-import { getNodesFromPlan2 } from "../packages/node-builder/node-builder";
+import { getNodesFromPlan } from "../packages/node-builder/node-builder";
 import { parseTfConfigPlan } from "../packages/tf-parser/tf-config-plan-parser";
 import { parseTfPlan } from "../packages/tf-parser/tf-plan-parser";
 
@@ -65,7 +65,7 @@ export function TfVizContextProvider({ children }: TfVizContextProps) {
     const jsonPlanFile = JSON.parse(planFile);
     const parsedJsonPlan = parseTfPlan(jsonPlanFile);
     const parsedJsonConfig = parseTfConfigPlan(jsonPlanFile);
-    const nodesFromPlanAndConfig = getNodesFromPlan2(
+    const nodesFromPlanAndConfig = getNodesFromPlan(
       parsedJsonPlan,
       parsedJsonConfig
     );

@@ -21,15 +21,20 @@ import ModuleNode from "./components/nodes/ModuleNode/ModuleNode";
 import ResourceNode from "./components/nodes/ResourceNode/ResourceNode";
 import type { CustomNodeType } from "./components/nodes/types";
 import { useTfVizContext } from "./context/TfVizContext";
+import {
+  dataNodeName,
+  moduleNodeName,
+  resourceNodeName,
+} from "./packages/node-builder/graphConstants";
 
 type Props = {
   onNodeSelect: (node: CustomNodeType) => void;
 };
 
 const nodeTypes = {
-  resourceNode: ResourceNode,
-  moduleNode: ModuleNode,
-  dataNode: DataNode,
+  [resourceNodeName]: ResourceNode,
+  [moduleNodeName]: ModuleNode,
+  [dataNodeName]: DataNode,
 };
 
 function Vizualiser({ onNodeSelect }: Props) {
@@ -51,7 +56,7 @@ function Vizualiser({ onNodeSelect }: Props) {
           style: isSelected
             ? {
                 stroke:
-                  nodeType === "dataNode"
+                  nodeType === dataNodeName
                     ? "var(--mantine-color-green-5)"
                     : "var(--mantine-color-blue-5)",
                 strokeWidth: 2,
