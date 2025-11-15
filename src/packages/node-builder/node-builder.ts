@@ -7,25 +7,17 @@ import type {
 } from "../../components/nodes/types";
 import { getDataId } from "../ids";
 import type { TfVizPlan, TfVizResource } from "../tf-parser/tf-plan-parser";
-import type {
-  ChangeType,
-  TfVizConfigPlan,
-  TfVizConfigResource,
-} from "../tf-parser/types";
+import type { TfVizConfigPlan, TfVizConfigResource } from "../tf-parser/types";
 
 const moduleNode = "moduleNode";
 const resourceNode = "resourceNode";
 const dataNode = "dataNode";
 
-function buildResourceNode(
-  resource: TfVizResource,
-  idx: number,
-  actions: Map<string, ChangeType>
-) {
+function buildResourceNode(resource: TfVizResource, idx: number) {
   const node: Node<TfVizResource> = {
     id: resource.id,
     position: { x: 10, y: 100 * idx },
-    data: { ...resource, changeType: actions.get(resource.address) },
+    data: resource,
     type: resourceNode,
   };
   return node;
@@ -61,12 +53,9 @@ function buildDataNode(
 
 function getNodesFromPlan2(
   plan: TfVizPlan,
-  config: TfVizConfigPlan,
-  actions: Map<string, ChangeType>
+  config: TfVizConfigPlan
 ): CustomNodeType[] {
-  const resourceNodes = plan.resources.map((r, i) =>
-    buildResourceNode(r, i, actions)
-  );
+  const resourceNodes = plan.resources.map((r, i) => buildResourceNode(r, i));
   const dataNodes = config.resources
     .filter((x) => x.mode === "data")
     .map((dn, i) => buildDataNode(dn, i));
@@ -83,10 +72,7 @@ function getNodesFromPlan2(
           position: { x: 10, y: (ri + 1) * 75 },
           parentId: modRest.id,
           extent: "parent",
-          data: {
-            ...res,
-            changeType: actions.get(res.address),
-          },
+          data: res,
         };
         return node;
       });
