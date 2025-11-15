@@ -14,11 +14,12 @@ function parseProviders(planFile: Plan): { name: string; value: string }[] {
   const keys = Object.keys(planFile.configuration.provider_config);
   return keys.map((k) => {
     const p = planFile.configuration!.provider_config![k];
+    const fullName = p.full_name || k;
+    const domainIndex = fullName.indexOf("/");
     return {
       name: k,
-      value: p.full_name
-        ? p.full_name.replace("registry.terraform.io/", "")
-        : k,
+      value:
+        domainIndex !== -1 ? fullName.substring(domainIndex + 1) : fullName,
     };
   });
 }
