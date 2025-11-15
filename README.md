@@ -9,9 +9,10 @@ Transform complex Terraform plan files into intuitive, interactive visual graphs
 ![Terraform Plan Visualizer Screenshot](./docs/screenshot.jpeg)
 
 [![License](https://img.shields.io/github/license/joachimdalen/terraform-plan-visualizer)](LICENSE)
-[![Version](https://img.shields.io/github/package-json/v/joachimdalen/terraform-plan-visualizer)](package.json)
 
-[Features](#features) • [Getting Started](#getting-started) • [Usage](#usage) • [Development](#development)
+<!-- [![Version](https://img.shields.io/github/package-json/v/joachimdalen/terraform-plan-visualizer)](package.json) -->
+
+[Features](#-features) • [Getting Started](#-getting-started) • [Usage](#-usage) • [Development](#-usage)
 
 </div>
 
@@ -34,7 +35,7 @@ If this project helped you, please consider giving it a ⭐️! It's the only wa
 - **🔄 Change Detection** - Instantly identify which resources will be created, updated, or destroyed
 - **🔗 Relationship Mapping** - Understand dependencies and connections between resources
 - **💾 Export Options** - Download your infrastructure graph as PNG og SVG for documentation and presentations
-- **🎯 Interactive Node Details** - Click any node to view detailed information about the resource or change
+- **🎯 Interactive Node Details** - Click any node to show its path or double click any node to view detailed information about the resource or change
 - **📋 JSON Plan File Support** - Load standard Terraform JSON plan files directly
 
 ---
@@ -43,7 +44,7 @@ If this project helped you, please consider giving it a ⭐️! It's the only wa
 
 ### Prerequisites
 
-- **Node.js** 18.x or higher
+- **Node.js** 20.x or higher
 - **npm** or **yarn** package manager
 - **Terraform** CLI (to generate plan files)
 
@@ -157,22 +158,6 @@ Click the settings icon to configure:
 - **[Mantine](https://mantine.dev/)** - Component library
 - **[ELK.js](https://github.com/kieler/elkjs)** - Automatic graph layout
 - **[html-to-image](https://github.com/bubkoo/html-to-image)** - Export to image
-
-### Available Scripts
-
-```bash
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
-
-# Lint code
-npm run lint
-```
 
 ### Contributing
 
