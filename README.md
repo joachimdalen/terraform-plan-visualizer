@@ -6,7 +6,7 @@
 
 Transform complex Terraform plan files into intuitive, interactive visual graphs. Understand your infrastructure changes at a glance with a beautiful node-based visualization.
 
-![Terraform Plan Visualizer Screenshot](./docs/screenshot.jpeg)
+![Terraform Plan Visualizer Screenshot](./docs/demo.gif)
 
 [![License](https://img.shields.io/github/license/joachimdalen/terraform-plan-visualizer)](LICENSE)
 
