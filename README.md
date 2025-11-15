@@ -12,7 +12,7 @@ Transform complex Terraform plan files into intuitive, interactive visual graphs
 
 <!-- [![Version](https://img.shields.io/github/package-json/v/joachimdalen/terraform-plan-visualizer)](package.json) -->
 
-[Features](#-features) • [Getting Started](#-getting-started) • [Usage](#-usage) • [Development](#-usage)
+[Features](#-features) • [Getting Started](#-getting-started) • [Usage](#-usage) • [Contributing](#contributing)
 
 </div>
 
@@ -174,25 +174,3 @@ Contributions are welcome! Please feel free to submit a Pull Request. For major 
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 🙏 Acknowledgments
-
-- Inspired by the need to better understand complex Terraform infrastructure changes
-- Built with the amazing [ReactFlow](https://reactflow.dev/) library
-- Icons provided by [Tabler Icons](https://tabler.io/icons)
-
----
-
-## 💡 Future Enhancements
-
-- [ ] Support for Terraform configuration files (`.tf` files)
-- [ ] Filtering by provider, module, or change type
-- [ ] Search functionality to find specific resources
-- [ ] Comparison between different plan versions
-- [ ] Dark mode support
-- [ ] More export formats (SVG, PDF)
-- [ ] Terraform state file visualization
-
----
