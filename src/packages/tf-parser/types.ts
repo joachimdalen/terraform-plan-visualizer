@@ -79,7 +79,10 @@ export type Change = {
   before_identity: Record<string, object>;
   after_identity: Record<string, object>;
 };
-export type State = {};
+export type State = {
+  // TODO: Update with actual types
+  [key: string]: string;
+};
 export type Config = {
   provider_config?: Record<string, ProviderConfig>;
   root_module?: ConfigModule;
@@ -143,7 +146,10 @@ export type ResourceAttribute = {
   resource: string;
   attribute: string;
 };
-export type CheckResultStatic = {};
+export type CheckResultStatic = {
+  // TODO: Update with actual types
+  [key: string]: string;
+};
 export type ActionInvocation = {
   address?: string;
   type?: string;
@@ -155,7 +161,10 @@ export type ActionInvocation = {
   lifecycle_action_trigger?: LifecycleActionTrigger;
   invoke_action_trigger?: InvokeActionTrigger;
 };
-export type Actions = {};
+export type Actions = {
+  // TODO: Update with actual types
+  [key: string]: string;
+};
 export type Importing = {
   id?: string;
   unknown?: boolean;
@@ -168,7 +177,10 @@ export type LifecycleActionTrigger = {
   action_trigger_block_index: number;
   action_list_index: number;
 };
-export type InvokeActionTrigger = {};
+export type InvokeActionTrigger = {
+  // TODO: Update with actual types
+  [key: string]: string;
+};
 
 export type StateOutput = {
   sensitive: boolean;

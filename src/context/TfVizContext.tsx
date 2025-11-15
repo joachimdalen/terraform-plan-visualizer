@@ -89,16 +89,10 @@ export function TfVizContextProvider({ children }: TfVizContextProps) {
       }
       formatGraph(nodes, edges, fullOptions).then((res) => {
         setIntNodes(res);
-
         fitView();
       });
-      // createLayout(nodes, edges).then((res) => {
-      //   setIntNodes(res?.nodes);
-      //   setIntEdges(res?.edges);
-      //   fitView();
-      // });
     },
-    [nodes, edges, fitView]
+    [nodes, edges, fitView, formatterOptions]
   );
 
   return (
