@@ -3,6 +3,6 @@ import { defineConfig } from "vite";
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: "/terraform-plan-visualizer",
+  base: "/terraform-plan-visualizer/",
   plugins: [react()],
 });
