@@ -177,9 +177,6 @@ async function formatGraph(
   return nodes.map((n) => {
     const pos = nodePositions.get(n.id);
     const size = nodeSizes.get(n.id);
-
-    console.log(n.id, pos, size);
-
     return {
       ...n,
       width: size?.width,

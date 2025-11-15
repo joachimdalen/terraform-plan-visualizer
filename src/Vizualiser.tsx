@@ -32,7 +32,7 @@ const nodeTypes = {
   dataNode: DataNode,
 };
 
-function Vizualiser2({ onNodeSelect }: Props) {
+function Vizualiser({ onNodeSelect }: Props) {
   const { nodes, edges, setNodes, setEdges } = useTfVizContext();
   const computedColorScheme = useComputedColorScheme("light", {
     getInitialValueInEffect: true,
@@ -77,13 +77,12 @@ function Vizualiser2({ onNodeSelect }: Props) {
     },
     []
   );
-  const handleNodeClick = useCallback<NodeMouseHandler<CustomNodeType>>(
-    (_, node) => {
-      console.log("node selected", node);
-    },
-    []
-  );
 
+  const onEdgesChange: OnEdgesChange = useCallback(
+    (changes) =>
+      setEdges((edgesSnapshot) => applyEdgeChanges(changes, edgesSnapshot)),
+    [setEdges]
+  );
   const onNodesChange: OnNodesChange<CustomNodeType> = useCallback(
     (changes) => {
       const selectedNodes = changes.filter((x) => x.type === "select");
@@ -100,13 +99,9 @@ function Vizualiser2({ onNodeSelect }: Props) {
         applyNodeChanges(changes, nodesSnapshot)
       );
     },
-    [setNodes, nodes, edges]
+    [highlightNodeDependencies, onEdgesChange, setNodes]
   );
-  const onEdgesChange: OnEdgesChange = useCallback(
-    (changes) =>
-      setEdges((edgesSnapshot) => applyEdgeChanges(changes, edgesSnapshot)),
-    [setEdges]
-  );
+
   const onConnect: OnConnect = useCallback(
     (params) => setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot)),
     [setEdges]
@@ -120,7 +115,6 @@ function Vizualiser2({ onNodeSelect }: Props) {
       onEdgesChange={onEdgesChange}
       onConnect={onConnect}
       onNodeDoubleClick={onNodeDoubleClick}
-      onNodeClick={handleNodeClick}
       fitView
       colorMode={computedColorScheme === "light" ? "light" : "dark"}
     >
@@ -130,4 +124,4 @@ function Vizualiser2({ onNodeSelect }: Props) {
   );
 }
 
-export default Vizualiser2;
+export default Vizualiser;

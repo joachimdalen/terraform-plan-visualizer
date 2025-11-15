@@ -93,7 +93,6 @@ function getNodesFromPlan2(
 
       let moduleData: DataNode[] = [];
       const configModule = config.modules.find((x) => x.name === tempName);
-      console.log("configModule", configModule, name);
       if (configModule) {
         moduleData = configModule.resources
           .filter((x) => x.mode === "data")

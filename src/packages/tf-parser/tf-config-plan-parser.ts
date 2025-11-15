@@ -86,8 +86,6 @@ function getDependencies(expressions?: Record<string, Expression>): string[] {
       if (Array.isArray(exp)) {
         dependencies.push(...exp.flatMap(getDependencies));
       }
-
-      console.log("exp.ref is not set for", exp);
       continue;
     }
 
@@ -102,11 +100,10 @@ function getDependencies(expressions?: Record<string, Expression>): string[] {
 
       const segments = ref.split(".");
 
-      if (segments.length == 2) {
-        dependencies.push(ref);
-      }
-      if (segments.length === 3 && ref.startsWith("data.")) {
-        console.log("Pushing data reference", ref);
+      if (
+        segments.length == 2 ||
+        (segments.length === 3 && ref.startsWith("data."))
+      ) {
         dependencies.push(ref);
       }
     }

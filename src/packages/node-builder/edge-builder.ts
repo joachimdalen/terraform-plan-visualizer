@@ -10,7 +10,6 @@ import type { TfVizConfigPlan, TfVizConfigResource } from "../tf-parser/types";
 const edgeType = "smoothstep";
 
 function buildEdges(config: TfVizConfigPlan, nodes: CustomNodeType[]) {
-  console.log(nodes, config);
   let edges: Edge[] = [];
   for (const node of nodes) {
     if (node.id.startsWith("res-") && node.parentId === undefined) {
@@ -183,10 +182,7 @@ function buildModuleEdge(
   nodes: CustomNodeType[]
 ): Edge[] | undefined {
   const edges: Edge[] = [];
-  // if (node.data.index === undefined) {
-  //   console.log("not indexed");
-  //   return undefined;
-  // }
+
   const module = config.modules.find(
     (x) => x.name === node.data.baseAddress.replace("module.", "")
   );
@@ -202,7 +198,7 @@ function buildModuleEdge(
           x.data.index === node.data.index
         : x.id != node.id && x.data.baseAddress === dependency
     );
-    console.log(node.data.name, dependency, relatedNodes);
+
     for (const relatedNode of relatedNodes) {
       edges.push({
         id: getEdgeId(),

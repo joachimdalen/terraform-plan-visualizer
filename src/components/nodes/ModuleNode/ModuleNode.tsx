@@ -7,11 +7,7 @@ import classes from "./ModuleNode.module.css";
 function ModuleNode({ data, height, width }: NodeProps<ModuleNode>) {
   return (
     <Paper withBorder className={classes.node} h={height} w={width}>
-      <Handle
-        type="target"
-        position={Position.Top}
-        onConnect={(params) => console.log("handle onConnect", params)}
-      />
+      <Handle type="target" position={Position.Top} />
       <Box className={classes.header}>
         <IconPackage size={24} />
         <Text>Module</Text>

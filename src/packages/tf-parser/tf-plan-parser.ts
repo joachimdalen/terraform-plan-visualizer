@@ -76,7 +76,6 @@ function parseTfModule(module: StateModule) {
     index: getIndexFromAddress(address),
     resources: module.resources?.map(parseTfResource) ?? [],
   };
-  console.log(address, getIndexFromAddress(address));
   return mod;
 }
 

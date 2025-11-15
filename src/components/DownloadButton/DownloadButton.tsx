@@ -39,8 +39,8 @@ function DownloadButton() {
     // we then overwrite the transform of the `.react-flow__viewport` element
     // with the style option of the html-to-image library
     const nodesBounds = getNodesBounds(getNodes());
-    const imageWidth = nodesBounds.width + 100;
-    const imageHeight = nodesBounds.height + 100;
+    const imageWidth = nodesBounds.width;
+    const imageHeight = nodesBounds.height;
     const viewport = getViewportForBounds(
       nodesBounds,
       imageWidth,
