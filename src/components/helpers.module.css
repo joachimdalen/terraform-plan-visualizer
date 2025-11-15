@@ -1,0 +1,6 @@
+.disabledSubtleButton {
+  &:disabled {
+    color: var(--mantine-color-gray-5);
+    background-color: transparent;
+  }
+}
