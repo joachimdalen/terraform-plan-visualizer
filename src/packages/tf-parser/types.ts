@@ -205,13 +205,3 @@ export type StateResource = {
   tainted?: boolean;
   deposed_key?: string;
 };
-
-export type ChangeType = {
-  isNoChange: boolean;
-  isCreate: boolean;
-  isRead: boolean;
-  isUpdate: boolean;
-  isDelete: boolean;
-  isDeleteCreate: boolean;
-  isCreateDelete: boolean;
-};

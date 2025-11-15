@@ -6,9 +6,12 @@ import {
   IconPlus,
   IconTrash,
 } from "@tabler/icons-react";
-import type { ChangeType } from "../packages/tf-parser/types";
-function ChangeTypeIcon({ changeType }: { changeType: ChangeType }) {
-  if (changeType.isDeleteCreate) {
+function ChangeTypeIcon({ changeType }: { changeType: string[] }) {
+  if (
+    changeType.length === 2 &&
+    changeType[0] === "delete" &&
+    changeType[1] === "create"
+  ) {
     return (
       <ThemeIcon
         variant="gradient"
@@ -20,7 +23,11 @@ function ChangeTypeIcon({ changeType }: { changeType: ChangeType }) {
     );
   }
 
-  if (changeType.isCreateDelete) {
+  if (
+    changeType.length === 2 &&
+    changeType[0] === "create" &&
+    changeType[1] === "delete"
+  ) {
     return (
       <ThemeIcon
         variant="gradient"
@@ -32,35 +39,35 @@ function ChangeTypeIcon({ changeType }: { changeType: ChangeType }) {
     );
   }
 
-  if (changeType.isCreate) {
+  if (changeType.length === 1 && changeType[0] === "create") {
     return (
       <ThemeIcon variant="light" color="green">
         <IconPlus />
       </ThemeIcon>
     );
   }
-  if (changeType.isDelete) {
+  if (changeType.length === 1 && changeType[0] === "delete") {
     return (
       <ThemeIcon variant="light" color="red">
         <IconTrash />
       </ThemeIcon>
     );
   }
-  if (changeType.isUpdate) {
+  if (changeType.length === 1 && changeType[0] === "update") {
     return (
       <ThemeIcon variant="light" color="yellow">
         <IconPencil />
       </ThemeIcon>
     );
   }
-  if (changeType.isRead) {
+  if (changeType.length === 1 && changeType[0] === "read") {
     return (
       <ThemeIcon variant="light" color="indigo">
         <IconEye />
       </ThemeIcon>
     );
   }
-  if (changeType.isNoChange) {
+  if (changeType.length === 1 && changeType[0] === "no-op") {
     return (
       <ThemeIcon variant="light" color="gray">
         <IconBan />

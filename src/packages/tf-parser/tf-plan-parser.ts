@@ -1,5 +1,5 @@
 import { getModuleId, getResourceId } from "../ids";
-import type { Plan, StateModule, StateResource } from "./types";
+import type { Plan, ResourceChange, StateModule, StateResource } from "./types";
 
 export type TfVizResource = {
   id: string;
@@ -12,6 +12,7 @@ export type TfVizResource = {
   moduleIndex?: string;
   provider: string;
   registry: string;
+  changeType?: string[];
 };
 
 export type TfVisModuleNoResources = {
@@ -29,14 +30,26 @@ export type TfVizPlan = {
   modules: TfVizModule[];
 };
 
+function getChangeType(
+  address: string,
+  changes?: ResourceChange[]
+): string[] | undefined {
+  if (!changes) return undefined;
+
+  const change = changes.find((x) => x.address === address);
+  if (change === undefined) return undefined;
+
+  return change.change?.actions;
+}
+
 function parseTfPlan(planFile: Plan): TfVizPlan {
   const resources: TfVizResource[] = [];
   const modules: TfVizModule[] = [];
   for (const res of planFile.planned_values?.root_module?.resources || []) {
-    resources.push(parseTfResource(res));
+    resources.push(parseTfResource(res, planFile.resource_changes));
   }
   for (const res of planFile.planned_values?.root_module?.child_modules || []) {
-    modules.push(parseTfModule(res));
+    modules.push(parseTfModule(res, planFile.resource_changes));
   }
   return {
     resources,
@@ -44,7 +57,7 @@ function parseTfPlan(planFile: Plan): TfVizPlan {
   };
 }
 
-function parseTfResource(resource: StateResource) {
+function parseTfResource(resource: StateResource, changes?: ResourceChange[]) {
   const providerName = getValueOrThow(resource.provider_name);
   const provider = providerName.replace("registry.terraform.io/", "");
   const registry = providerName.split("/")[0];
@@ -61,12 +74,13 @@ function parseTfResource(resource: StateResource) {
     module: getModuleName(baseAddress),
     provider,
     registry,
+    changeType: getChangeType(address, changes),
   };
 
   return res;
 }
 
-function parseTfModule(module: StateModule) {
+function parseTfModule(module: StateModule, changes?: ResourceChange[]) {
   const address = getValueOrThow(module.address);
   const mod: TfVizModule = {
     id: getModuleId(),
@@ -74,7 +88,7 @@ function parseTfModule(module: StateModule) {
     address: address,
     baseAddress: stripIndexFromAddress(address),
     index: getIndexFromAddress(address),
-    resources: module.resources?.map(parseTfResource) ?? [],
+    resources: module.resources?.map((r) => parseTfResource(r, changes)) ?? [],
   };
   return mod;
 }
