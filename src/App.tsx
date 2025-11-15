@@ -19,6 +19,7 @@ function App() {
           main: {
             display: "flex",
             paddingTop: "var(--app-shell-header-offset, 0rem)",
+            paddingBottom: 0,
           },
         }}
       >
