@@ -14,20 +14,22 @@ function ModuleNode({ data, height, width }: NodeProps<ModuleNode>) {
       </Box>
       <Handle type="source" position={Position.Bottom} />
       <Box className={classes.footer}>
-        <Group gap="5" wrap="nowrap">
-          <Text c="dimmed" fz="xs">
-            Name:
-          </Text>
-          <Text fz="xs">{data.name}</Text>
-        </Group>
-        {data.index && (
+        <Group>
           <Group gap="5" wrap="nowrap">
             <Text c="dimmed" fz="xs">
-              Index:
+              Name:
             </Text>
-            <Text fz="xs">{data.index}</Text>
+            <Text fz="xs">{data.name}</Text>
           </Group>
-        )}
+          {data.index && (
+            <Group gap="5" wrap="nowrap">
+              <Text c="dimmed" fz="xs">
+                Index:
+              </Text>
+              <Text fz="xs">{data.index}</Text>
+            </Group>
+          )}
+        </Group>
       </Box>
     </Paper>
   );
