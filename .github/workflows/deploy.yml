@@ -1,6 +1,9 @@
 name: Deploy
 on:
   workflow_dispatch:
+  push:
+    tags:
+      - v*
 
 permissions:
   contents: read
